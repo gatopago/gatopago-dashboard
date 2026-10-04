@@ -1,7 +1,4 @@
 @import 'tailwindcss';
-
-/* Same brand system as the consumer app (client/src/index.css), but laid out
-   desktop-first: the dashboard is a wide admin surface, not a centered mobile app. */
 @theme {
   --color-sky: #f85239;
   --color-pink: #cf3433;
@@ -83,8 +80,6 @@ body {
   line-height: 1.55;
   letter-spacing: 0;
 }
-
-/* Subtle brand ambience, fixed + GPU-composited (no scroll repaint). */
 body::before {
   content: '';
   position: fixed;
@@ -157,8 +152,6 @@ a {
 .mono {
   font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
 }
-
-/* ===== Buttons (same hierarchy as the app) ===== */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -238,8 +231,6 @@ a {
   background-clip: text;
   color: transparent;
 }
-
-/* ===== Surfaces ===== */
 .card {
   background: var(--color-surface);
   border: 1px solid var(--color-border);

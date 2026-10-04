@@ -1,6 +1,3 @@
-// Typed API layer for the dashboard — talks to the same Worker as the app.
-// All dashboard calls are authenticated with the owner's Firebase session.
-
 import { fetchWithAuth } from './authFetch';
 import type { User } from './firebase';
 import { SERVER_URL } from './brand';

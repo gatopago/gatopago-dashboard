@@ -17,8 +17,6 @@ function notify(kind: 'success' | 'error', options: NotificationOptions) {
   pushToast({ kind, ...options });
 }
 
-// Compatibility-shaped local facade keeps call sites small while avoiding a
-// 46 kB-gzip animation dependency for two simple notification variants.
 export const sileo = {
   success: (options: NotificationOptions) => notify('success', options),
   error: (options: NotificationOptions) => notify('error', options),

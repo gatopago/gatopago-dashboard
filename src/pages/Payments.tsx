@@ -8,8 +8,7 @@ import { formatAmount, formatDateTime } from '../lib/format';
 
 type Intent = {
   id: string;
-  // Known values today: awaiting_payment | paid | expired | canceled — but the
-  // API may add more, so we keep it open and render unknown ones as-is.
+
   status: string;
   amount: string;
   currency: string;
@@ -30,8 +29,6 @@ const STATUS: Record<string, { label: string; cls: string }> = {
 };
 
 export default function Payments({ user }: { user: User }) {
-  // Server-side filters (part of the SWR key, so each combination paginates
-  // correctly); the text search is client-side over the loaded rows.
   const [statusF, setStatusF] = useState('all');
   const [modeF, setModeF] = useState('all');
   const [search, setSearch] = useState('');
@@ -40,7 +37,7 @@ export default function Payments({ user }: { user: User }) {
     (statusF !== 'all' ? `&status=${statusF}` : '') + (modeF !== 'all' ? `&mode=${modeF}` : '');
 
   function getKey(index: number, prev: Page | null) {
-    if (prev && !(prev.has_more ?? false)) return null; // reached the end
+    if (prev && !(prev.has_more ?? false)) return null;
     if (index === 0) return `/merchant/payment_intents?limit=${PAGE_SIZE}${filterQs}`;
     const last = prev?.data[prev.data.length - 1];
     return last
@@ -59,7 +56,6 @@ export default function Payments({ user }: { user: User }) {
     refreshInterval: 15000,
   });
 
-  // Changing a filter changes every key: collapse back to one page.
   useEffect(() => {
     void setSize(1);
   }, [filterQs, setSize]);
@@ -73,7 +69,7 @@ export default function Payments({ user }: { user: User }) {
     : loaded;
   const hasMore = pages && pages.length > 0 ? (pages[pages.length - 1].has_more ?? false) : false;
   const loadingMore = size > 0 && pages !== undefined && pages.length < size;
-  // A page fetch failed while we already have data (e.g. "Cargar más" broke).
+
   const loadMoreError = Boolean(error && pages);
 
   return (
@@ -83,7 +79,7 @@ export default function Payments({ user }: { user: User }) {
         <p className="text-[14px] text-text-muted">Tus payment intents y su estado.</p>
       </header>
 
-      {/* Filters */}
+      {}
       <div className="flex flex-col sm:flex-row gap-2.5 mb-5">
         <input
           className="field flex-1"

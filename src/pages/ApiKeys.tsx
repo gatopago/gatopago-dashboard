@@ -31,7 +31,7 @@ export default function ApiKeys({ user }: { user: User }) {
   const [name, setName] = useState('');
   const [creating, setCreating] = useState(false);
   const [fresh, setFresh] = useState<string | null>(null);
-  // Pending confirmations (in-design dialogs instead of native confirm()).
+
   const [confirmLive, setConfirmLive] = useState(false);
   const [revokeTarget, setRevokeTarget] = useState<ApiKey | null>(null);
 
@@ -56,7 +56,6 @@ export default function ApiKeys({ user }: { user: User }) {
     }
   }
 
-  // Live keys move real money: one deliberate extra step before creating.
   function create() {
     if (mode === 'live') {
       if (!liveEnabled) {
@@ -112,7 +111,7 @@ export default function ApiKeys({ user }: { user: User }) {
         </p>
       </header>
 
-      {/* Create */}
+      {}
       <form
         className="card p-5 mb-5 flex flex-col sm:flex-row gap-3 sm:items-end"
         onSubmit={(event) => {
@@ -158,7 +157,7 @@ export default function ApiKeys({ user }: { user: User }) {
         </p>
       )}
 
-      {/* Fresh key — shown once */}
+      {}
       {fresh && (
         <div className="card p-5 mb-5 border-brand-gradient" style={{ borderColor: 'transparent' }}>
           <p className="text-[13px] text-text-muted mb-2">
@@ -176,7 +175,7 @@ export default function ApiKeys({ user }: { user: User }) {
         </div>
       )}
 
-      {/* List */}
+      {}
       {isLoading && !data ? (
         <p className="text-[14px] text-text-muted">Cargando…</p>
       ) : error && !data ? (

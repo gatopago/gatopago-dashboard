@@ -20,7 +20,6 @@ function navClass({ isActive }: { isActive: boolean }) {
   ].join(' ');
 }
 
-/** External link to the canonical API reference (opens the landing docs). */
 function DocsLink() {
   return (
     <a
@@ -50,7 +49,7 @@ function DocsLink() {
 export default function Layout({ user, children }: { user: User; children: ReactNode }) {
   return (
     <div className="flex min-h-dvh">
-      {/* Sidebar (desktop) */}
+      {}
       <aside className="hidden md:flex md:flex-col w-64 shrink-0 border-r border-border px-4 py-6 gap-1">
         <div className="flex items-center gap-2.5 px-2 mb-6">
           <Logo className="w-7" />
@@ -75,7 +74,7 @@ export default function Layout({ user, children }: { user: User; children: React
         </div>
       </aside>
 
-      {/* Mobile top bar */}
+      {}
       <div className="flex-1 flex flex-col min-w-0">
         <header className="md:hidden sticky top-0 z-10 bg-bg/90 backdrop-blur border-b border-border px-4 py-3 flex items-center gap-3">
           <Logo className="w-6 shrink-0" />

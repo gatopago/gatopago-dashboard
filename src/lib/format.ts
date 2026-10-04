@@ -1,6 +1,3 @@
-// Shared formatters so amounts and dates read consistently ("es" locale) across
-// the whole dashboard, instead of each page rolling its own toLocaleString.
-
 const AMOUNT = new Intl.NumberFormat('es', { maximumFractionDigits: 6 });
 const DATE = new Intl.DateTimeFormat('es', { day: 'numeric', month: 'short', year: 'numeric' });
 const DATE_TIME = new Intl.DateTimeFormat('es', {

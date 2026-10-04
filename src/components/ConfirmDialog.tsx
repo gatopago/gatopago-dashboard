@@ -1,7 +1,3 @@
-// In-design confirmation modal, replacing the browser-native confirm() for
-// destructive or consequential actions (revoke key, delete endpoint, create a
-// live key). Mount it conditionally; Escape and backdrop click cancel.
-
 import { useEffect, useRef, type ReactNode } from 'react';
 
 export default function ConfirmDialog({
@@ -15,7 +11,7 @@ export default function ConfirmDialog({
   title: string;
   body: ReactNode;
   confirmLabel: string;
-  /** true = destructive styling on the confirm button. */
+
   danger?: boolean;
   onConfirm: () => void;
   onCancel: () => void;

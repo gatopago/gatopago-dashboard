@@ -177,7 +177,7 @@ export default function PaymentDetail({ user }: { user: User }) {
             </div>
           )}
 
-          {/* Cobrar en persona: the checkout as QR while it can still be paid */}
+          {}
           {data.checkout_url && data.status === 'awaiting_payment' && (
             <div className="card p-5">
               <h2 className="text-[16px] mb-1">Cobrar en persona</h2>
@@ -219,7 +219,7 @@ export default function PaymentDetail({ user }: { user: User }) {
             </div>
           )}
 
-          {/* Flow B: on-chain authorization for an external wallet */}
+          {}
           {data.onchain ? (
             <div className="card p-5">
               <div className="flex items-center justify-between mb-2">

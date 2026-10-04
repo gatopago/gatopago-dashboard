@@ -81,7 +81,7 @@ export default function Login() {
       setMode('code');
     } catch (sendError) {
       setError(sendError instanceof Error ? sendError.message : 'No pudimos enviar el código.');
-      // Turnstile tokens are single-use even when the downstream request fails.
+
       resetChallenge();
     } finally {
       setBusy(null);

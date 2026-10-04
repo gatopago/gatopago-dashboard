@@ -12,8 +12,6 @@ const PAYMENTS_API_URL = withoutTrailingSlash(
     'https://gatopago-payments-api.parmelia.workers.dev',
 );
 
-// Compatibility export for existing dashboard views. The dashboard is a
-// Payments client; authentication-only calls use APP_API_URL explicitly.
 export const SERVER_URL = PAYMENTS_API_URL;
 export const DOCS_URL = `${withoutTrailingSlash(
   import.meta.env.VITE_SITE_URL || 'https://parmelia.me',

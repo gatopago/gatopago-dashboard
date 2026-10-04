@@ -1,5 +1,3 @@
-// Differentiated API-error state: says the load failed (instead of a misleading
-// empty state) and lets the user re-trigger the fetch.
 export default function ErrorState({
   message,
   onRetry,

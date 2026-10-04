@@ -13,8 +13,7 @@ export default function Overview({ user }: { user: User }) {
     error: hooksError,
     mutate: mutateHooks,
   } = useSWR('/merchant/webhooks', fetcher);
-  // Settlement identity: merchant charges land in the SAME user's GatoPago
-  // account (non-custodial) - said out loud because it is THE trust question.
+
   const { data: profile } = useSWR('/user/profile', (p: string) =>
     apiFetch<{ username?: string | null; walletAddress?: string | null }>(p, { user }),
   );
@@ -36,7 +35,7 @@ export default function Overview({ user }: { user: User }) {
         <p className="text-[14px] text-text-muted">Integra cobros en stablecoins en tres pasos.</p>
       </header>
 
-      {/* Counts */}
+      {}
       {countsError ? (
         <div className="mb-6 max-w-xl">
           <ErrorState
@@ -60,7 +59,7 @@ export default function Overview({ user }: { user: User }) {
         </div>
       )}
 
-      {/* Where the money lands - the trust question, answered up front */}
+      {}
       {profile?.walletAddress && (
         <div className="card p-4 mb-6 max-w-xl">
           <p className="text-[14px] text-text">
@@ -77,7 +76,7 @@ export default function Overview({ user }: { user: User }) {
         </div>
       )}
 
-      {/* Quickstart */}
+      {}
       <div className="card p-6 mb-5">
         <ol className="flex flex-col gap-4">
           <li className="flex gap-3">

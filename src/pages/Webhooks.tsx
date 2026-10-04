@@ -7,10 +7,6 @@ import type { User } from '../lib/firebase';
 import ErrorState from '../components/ErrorState';
 import ConfirmDialog from '../components/ConfirmDialog';
 
-// Contextual copy of the verification snippet from the canonical docs
-// (the GatoPago docs, #verifying-the-signature) - shown next to the secret on
-// purpose: it appears at the exact moment the developer needs it. The signing
-// scheme is HMAC-SHA256(secret, "<GatoPago-Timestamp>.<raw body>").
 const VERIFY_SNIPPET = `import crypto from "node:crypto";
 
 // Express: monta la ruta con express.raw({ type: "application/json" })
@@ -213,7 +209,7 @@ export default function Webhooks({ user }: { user: User }) {
         </div>
       )}
 
-      {/* How to verify - collapsible, lives next to where the secret is issued */}
+      {}
       <details className="card mb-5 group">
         <summary className="px-5 py-4 cursor-pointer list-none flex items-center justify-between text-[14px] text-text hover:bg-surface-2 transition-colors rounded-[inherit]">
           Cómo verificar la firma en tu servidor
@@ -288,7 +284,7 @@ export default function Webhooks({ user }: { user: User }) {
         </div>
       )}
 
-      {/* Delivery log */}
+      {}
       <div className="mt-8">
         <h2 className="text-[18px] mb-1">Entregas recientes</h2>
         <p className="text-[13px] text-text-muted mb-4">

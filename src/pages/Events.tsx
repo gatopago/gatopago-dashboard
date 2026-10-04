@@ -41,7 +41,7 @@ export default function Events({ user }: { user: User }) {
   const hasMore = pages && pages.length > 0 ? (pages[pages.length - 1].has_more ?? false) : false;
   const loadingMore = size > 0 && pages !== undefined && pages.length < size;
   const loadMoreError = Boolean(error && pages);
-  // Row whose payload is expanded (the JSON your webhook endpoint received).
+
   const [openId, setOpenId] = useState<string | null>(null);
 
   async function copy(value: string) {

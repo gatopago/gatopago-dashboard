@@ -13,9 +13,6 @@ import {
   type User,
 } from 'firebase/auth';
 
-// Same Firebase project as the consumer app → same account / SSO. The dashboard
-// only needs identity (to manage keys/webhooks); it never signs transactions, so
-// no passkey is involved here.
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,

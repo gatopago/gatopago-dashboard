@@ -10,7 +10,7 @@ export async function fetchWithAuth(user: User, input: RequestInfo | URL, init?:
   let token = await user.getIdToken();
   const response = await fetch(input, { ...init, headers: buildAuthHeaders(init?.headers, token) });
   if (response.status !== 401) return response;
-  // Token may have just expired — force-refresh once and retry.
+
   token = await user.getIdToken(true);
   return fetch(input, { ...init, headers: buildAuthHeaders(init?.headers, token) });
 }
