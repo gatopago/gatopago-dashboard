@@ -1,8 +1,8 @@
-import type { User } from "./firebase";
+import type { User } from './firebase';
 
 function buildAuthHeaders(headers: HeadersInit | undefined, token: string) {
   const nextHeaders = new Headers(headers);
-  nextHeaders.set("Authorization", `Bearer ${token}`);
+  nextHeaders.set('Authorization', `Bearer ${token}`);
   return nextHeaders;
 }
 

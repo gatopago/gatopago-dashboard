@@ -4,10 +4,10 @@
 // contextual snippet next to the data it needs (e.g. signature verification
 // beside the webhook secret).
 
-import { DOCS_URL } from "./brand";
+import { DOCS_URL } from './brand';
 
 export { DOCS_URL };
 
 export function docsUrl(anchor?: string): string {
-	return anchor ? `${DOCS_URL}#${anchor}` : DOCS_URL;
+  return anchor ? `${DOCS_URL}#${anchor}` : DOCS_URL;
 }
