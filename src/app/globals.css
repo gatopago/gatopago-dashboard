@@ -1,0 +1,304 @@
+@import 'tailwindcss';
+
+/* GatoPago's theme, as in the app (gatopago/src/consumer/theme.css). */
+@theme {
+  --color-cat-50: #fff0eb;
+  --color-cat-300: #cf3433;
+  --color-cat-500: #f85239;
+  --color-cat-700: #9f292e;
+  --color-on-cat: #0b0b0f;
+
+  --color-canvas: #fff8f0;
+  --color-surface: #fffdf9;
+  --color-surface-2: #eee4d8;
+  --color-surface-3: #e4d7ca;
+  --color-border: #d2c5b9;
+  --color-text: #0b0b0f;
+  --color-text-muted: #5f5650;
+  --color-text-faint: #6f625b;
+
+  --color-growth: #287b55;
+  --color-info: #256aa8;
+  --color-pending: #8a6200;
+  --color-danger: #b62e47;
+
+  --font-sans: 'Recursive Variable', 'Recursive', system-ui, sans-serif;
+  --font-display: 'Recursive Variable', 'Recursive', system-ui, sans-serif;
+  --font-mono: 'Recursive Variable', 'Recursive', ui-monospace, monospace;
+
+  --animate-fade-up: fade-up 240ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-fade-in: fade-in 160ms ease-out both;
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 8px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+}
+
+@layer base {
+  :root {
+    --recursive-linear: 'MONO' 0, 'CASL' 0, 'slnt' 0, 'CRSV' 0.5;
+    --recursive-casual: 'MONO' 0, 'CASL' 1, 'slnt' 0, 'CRSV' 0.5;
+    --recursive-mono: 'MONO' 1, 'CASL' 0, 'slnt' 0, 'CRSV' 0.5;
+    --ease-press: cubic-bezier(0.2, 0.8, 0.2, 1);
+    color-scheme: light;
+  }
+  body {
+    margin: 0;
+    background: var(--color-canvas);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    font-variation-settings: var(--recursive-linear);
+    font-synthesis: none;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1,
+  h2,
+  h3 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-variation-settings: var(--recursive-casual);
+    font-weight: 720;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+  }
+  button {
+    cursor: pointer;
+    background: none;
+    border: 0;
+    color: inherit;
+    font: inherit;
+  }
+  :where(button, a):focus-visible {
+    outline: 2px solid var(--color-cat-500);
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: rgb(248 82 57 / 0.32);
+  }
+}
+
+.type-mono {
+  font-variation-settings: var(--recursive-mono);
+  font-variant-numeric: tabular-nums slashed-zero;
+}
+
+.btn {
+  display: inline-flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 18px;
+  border: 2px solid currentColor;
+  font-variation-settings: var(--recursive-casual);
+  font-size: 14px;
+  font-weight: 760;
+  line-height: 1;
+  white-space: nowrap;
+  transition:
+    transform 150ms var(--ease-press),
+    box-shadow 150ms var(--ease-press),
+    background-color 140ms ease;
+}
+.btn-block {
+  width: 100%;
+}
+.btn-sm {
+  min-height: 40px;
+  padding-inline: 14px;
+  font-size: 13px;
+}
+.btn-primary {
+  border-color: var(--color-cat-500);
+  background: var(--color-cat-500);
+  color: var(--color-on-cat);
+  box-shadow: 4px 4px 0 var(--color-cat-700);
+}
+.btn-ghost {
+  border-color: var(--color-text);
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: 4px 4px 0 var(--color-surface-2);
+}
+.btn-danger {
+  border-color: var(--color-text);
+  background: var(--color-danger);
+  color: white;
+  box-shadow: 4px 4px 0 #78162b;
+}
+.btn:disabled {
+  border-color: var(--color-border);
+  background: var(--color-surface-3);
+  color: var(--color-text-faint);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+.btn:not(:disabled):active {
+  transform: translate(4px, 4px);
+  box-shadow: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .btn-primary:not(:disabled):hover,
+  .btn-ghost:not(:disabled):hover {
+    transform: translate(-2px, -2px);
+  }
+  .btn-ghost:not(:disabled):hover {
+    background: var(--color-cat-50);
+  }
+}
+.btn-text {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  color: var(--color-text-muted);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.card {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+.card-strong {
+  border: 2px solid var(--color-text);
+  background: var(--color-surface);
+  box-shadow: 6px 6px 0 var(--color-border);
+}
+
+.field {
+  width: 100%;
+  min-height: 46px;
+  padding-inline: 14px;
+  border: 2px solid var(--color-text);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 14px;
+}
+.field::placeholder {
+  color: var(--color-text-faint);
+}
+.field:focus {
+  outline: none;
+  box-shadow: 4px 4px 0 var(--color-cat-500);
+}
+
+.kicker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-cat-700);
+  font-size: 10px;
+  font-variation-settings: var(--recursive-mono);
+  font-weight: 720;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.kicker::before {
+  width: 8px;
+  height: 8px;
+  background: currentColor;
+  content: '';
+}
+
+.chip {
+  display: inline-flex;
+  min-height: 26px;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border: 1px solid var(--color-border);
+  font-size: 10px;
+  font-variation-settings: var(--recursive-mono);
+  font-weight: 680;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.chip::before {
+  width: 6px;
+  height: 6px;
+  background: currentColor;
+  content: '';
+}
+
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(90deg, var(--color-surface-2), var(--color-surface-3));
+}
+.skeleton::after {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, rgb(255 253 249 / 0.7), transparent);
+  animation: sweep 1.6s ease-in-out infinite;
+  content: '';
+}
+@keyframes sweep {
+  from {
+    transform: translateX(-120%);
+  }
+  to {
+    transform: translateX(360%);
+  }
+}
+
+/* The console's navigation: a column on wide screens, a scrolling row on phones. */
+.nav-link {
+  display: flex;
+  min-height: 42px;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border: 1px solid transparent;
+  color: var(--color-text-muted);
+  font-size: 14px;
+  white-space: nowrap;
+  transition:
+    background-color 140ms ease,
+    color 140ms ease;
+}
+.nav-link:hover {
+  background: var(--color-cat-50);
+  color: var(--color-text);
+}
+.nav-link[aria-current='page'] {
+  border-color: var(--color-text);
+  background: var(--color-cat-500);
+  color: var(--color-on-cat);
+  font-weight: 700;
+  box-shadow: 3px 3px 0 var(--color-cat-700);
+}
+.nav-row {
+  mask-image: linear-gradient(to right, black calc(100% - 32px), transparent);
+  scrollbar-width: none;
+}
+.nav-row::-webkit-scrollbar {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

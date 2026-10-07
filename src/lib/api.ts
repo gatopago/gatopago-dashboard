@@ -1,69 +1,85 @@
-import { fetchWithAuth } from './authFetch';
-import type { User } from './firebase';
-import { SERVER_URL } from './brand';
+import { signOut } from './session';
 
-export { SERVER_URL };
-
+/** A GatoPago API error: its `error_code`, or `NETWORK_ERROR` when it could not be reached. */
 export class ApiError extends Error {
-  status: number;
-  requestId?: string;
-  code?: string;
-  constructor(message: string, opts: { status?: number; requestId?: string; code?: string } = {}) {
-    super(message);
-    this.name = 'ApiError';
-    this.status = opts.status ?? 0;
-    this.requestId = opts.requestId;
-    this.code = opts.code;
+  constructor(
+    readonly status: number,
+    readonly code: string,
+  ) {
+    super(code);
   }
 }
 
-export type PaymentModeCapabilities = {
-  settlement: { chainId: number | null; name: string | null; isTestnet: boolean | null };
-  modes: {
-    test: { enabled: true };
-    live: { enabled: boolean; reason: string | null };
-  };
+/**
+ * Calls the GatoPago API: Wallet Core under `/app/v1/…` (signing in) and Flow under `/v1/…` (the
+ * console's data). An expired or revoked session signs out.
+ */
+export async function api<T>(
+  apiOrigin: string,
+  path: string,
+  init: { method?: string; body?: unknown; token?: string; signal?: AbortSignal } = {},
+): Promise<T> {
+  let response: Response;
+  const timeout = AbortSignal.timeout(20_000);
+  try {
+    response = await fetch(`${apiOrigin}${path}`, {
+      method: init.method ?? (init.body === undefined ? 'GET' : 'POST'),
+      headers: {
+        Accept: 'application/json',
+        ...(init.body === undefined ? {} : { 'Content-Type': 'application/json' }),
+        ...(init.token ? { Authorization: `Bearer ${init.token}` } : {}),
+      },
+      body: init.body === undefined ? undefined : JSON.stringify(init.body),
+      credentials: 'omit',
+      cache: 'no-store',
+      signal: init.signal ? AbortSignal.any([init.signal, timeout]) : timeout,
+    });
+  } catch (error) {
+    if (init.signal?.aborted) throw error;
+    throw new ApiError(0, 'NETWORK_ERROR');
+  }
+  const value = await response.json().catch(() => null);
+  if (response.status === 401 && init.token && path.startsWith('/v1/')) signOut();
+  if (!response.ok) throw new ApiError(response.status, value?.error_code ?? 'UNAVAILABLE');
+  return value as T;
+}
+
+const messages: Record<string, [es: string, en: string]> = {
+  CANCELLED: [
+    'Se canceló la confirmación en tu dispositivo. Puedes reintentar.',
+    'Confirmation was cancelled on your device. You can try again.',
+  ],
+  ACCOUNT_NOT_FOUND: [
+    'Esa llave no pertenece a una cuenta de GatoPago. Crea tu cuenta en la app primero.',
+    'That key does not belong to a GatoPago account. Create your account in the app first.',
+  ],
+  RATE_LIMITED: [
+    'Hay demasiados intentos. Espera un momento.',
+    'Too many attempts. Wait a moment.',
+  ],
+  NETWORK_ERROR: [
+    'No pudimos conectar con GatoPago. Revisa tu conexión y reintenta.',
+    'GatoPago cannot be reached. Check your connection and try again.',
+  ],
+  UNAUTHENTICATED: ['Tu sesión venció. Vuelve a entrar.', 'Your session expired. Sign in again.'],
 };
 
-type ApiOptions = { user: User; method?: string; body?: unknown };
-
-export async function apiFetch<T = Record<string, unknown>>(
-  path: string,
-  opts: ApiOptions,
-): Promise<T> {
-  const url = path.startsWith('http') ? path : `${SERVER_URL}${path}`;
-  const init: RequestInit = { method: opts.method ?? (opts.body !== undefined ? 'POST' : 'GET') };
-  if (opts.body !== undefined) {
-    init.headers = { 'Content-Type': 'application/json' };
-    init.body = JSON.stringify(opts.body);
+/** A message for the person for any failure: API codes and passkey prompts. */
+export function failureMessage(error: unknown, en: boolean): string {
+  let code = 'UNKNOWN';
+  for (let cause = error; cause instanceof Error; cause = cause.cause) {
+    if (cause instanceof ApiError) {
+      code = cause.code;
+      break;
+    }
+    if (cause.name === 'NotAllowedError' || cause.name === 'AbortError') {
+      code = 'CANCELLED';
+      break;
+    }
   }
-
-  let res: Response;
-  try {
-    res = await fetchWithAuth(opts.user, url, init);
-  } catch {
-    throw new ApiError('Sin conexión. Revisa tu internet e intenta de nuevo.', { status: 0 });
-  }
-
-  const data = (await res.json().catch(() => null)) as
-    | (Record<string, unknown> & { error?: unknown; error_code?: unknown; requestId?: unknown })
-    | null;
-
-  if (!res.ok) {
-    const serverMessage =
-      data && typeof data.error === 'string' && data.error.trim() ? data.error : null;
-    const fallback =
-      res.status >= 500
-        ? 'Tuvimos un problema de nuestro lado. Intenta de nuevo.'
-        : res.status === 401
-          ? 'Tu sesión expiró. Vuelve a iniciar sesión.'
-          : 'No se pudo completar la operación.';
-    throw new ApiError(serverMessage ?? fallback, {
-      status: res.status,
-      requestId: typeof data?.requestId === 'string' ? data.requestId : undefined,
-      code: typeof data?.error_code === 'string' ? data.error_code : undefined,
-    });
-  }
-
-  return (data ?? {}) as T;
+  const [es, english] = messages[code] ?? [
+    'No pudimos completar este paso. Reintenta.',
+    'We could not complete this step. Try again.',
+  ];
+  return en ? english : es;
 }
