@@ -103,12 +103,12 @@ export function Login({ settings }: { settings: ClientSettings }) {
         'Confirma con tu huella o tu rostro.',
       ];
 
-  /** Signing in on this device: a passkey account, or a Mera one (its passkey derives the key). */
-  const signInHere = (method: 'signInWithPasskey' | 'signInWithMera') => {
+  /** Signing in on this device with any GatoPago passkey: the account's kind is found, not asked. */
+  const signInHere = () => {
     setPasskeyBusy(true);
     setFailure(null);
     import('../lib/signInHere')
-      .then((signIn) => signIn[method](settings))
+      .then((signIn) => signIn.signInHere(settings))
       .catch((failure: unknown) => setFailure(failure))
       .finally(() => setPasskeyBusy(false));
   };
@@ -118,23 +118,15 @@ export function Login({ settings }: { settings: ClientSettings }) {
         type="button"
         className="btn btn-ghost btn-block"
         disabled={passkeyBusy}
-        onClick={() => signInHere('signInWithPasskey')}
+        onClick={signInHere}
       >
         {passkeyBusy
           ? en
             ? 'Confirm on your device…'
             : 'Confirma en tu dispositivo…'
           : en
-            ? 'Use my passkey on this device'
-            : 'Usar mi passkey en este dispositivo'}
-      </button>
-      <button
-        type="button"
-        className="btn-text text-[13px]"
-        disabled={passkeyBusy}
-        onClick={() => signInHere('signInWithMera')}
-      >
-        {en ? 'Is your account Mera? Sign in with Mera' : '¿Tu cuenta es Mera? Entrar con Mera'}
+            ? 'Use my key on this device'
+            : 'Usar mi llave en este dispositivo'}
       </button>
     </div>
   );
@@ -221,8 +213,8 @@ export function Login({ settings }: { settings: ClientSettings }) {
               <p className="mt-5 text-[13px] text-text-faint" aria-live="off">
                 {state === 'waiting'
                   ? en
-                    ? `Waiting for your phone · renews in ${seconds} s`
-                    : `Esperando tu teléfono · se renueva en ${seconds} s`
+                    ? `Waiting for your phone · renews in ${seconds}\u00a0s`
+                    : `Esperando tu teléfono · se renueva en ${seconds}\u00a0s`
                   : en
                     ? 'Preparing the code…'
                     : 'Preparando el código…'}

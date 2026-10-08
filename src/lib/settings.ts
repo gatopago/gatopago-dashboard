@@ -4,8 +4,10 @@ import { walletNetwork } from '@gatopago/shared/networks';
 export interface ClientSettings {
   /** This console's origin. */
   readonly businessOrigin: string;
-  /** The GatoPago app: its domain is the passkeys' (WebAuthn `rpId`). */
+  /** The GatoPago app, where the QR links. */
   readonly webOrigin: string;
+  /** The passkeys' domain (WebAuthn `rpId`): the app's, the same one it uses. */
+  readonly passkeyRpId: string;
   /** Wallet Core (sign-in) and Flow (`/v1`, the console's data). */
   readonly apiOrigin: string;
   /** Where merchants receive; accounts are derived and read there. */
@@ -36,10 +38,26 @@ for (const [id, url] of Object.entries(rpcUrls))
   if (new URL(url).protocol !== 'https:')
     throw new Error(`GATOPAGO_WALLET_RPC_URLS: invalid entry for ${id}`);
 
+/**
+ * `GATOPAGO_PASSKEY_RP_ID`, as the app sets it (by default the app's domain); this console must be
+ * on that domain or under it to use its passkeys.
+ */
+function passkeyRpId(webOrigin: string, businessOrigin: string): string {
+  const rpId = process.env.GATOPAGO_PASSKEY_RP_ID?.trim() || new URL(webOrigin).hostname;
+  const host = new URL(businessOrigin).hostname;
+  if (host !== rpId && !host.endsWith(`.${rpId}`))
+    throw new Error('GATOPAGO_PASSKEY_RP_ID must be this console domain or a parent of it');
+  return rpId;
+}
+
+const businessOrigin = origin('GATOPAGO_BUSINESS_ORIGIN');
+const webOrigin = origin('GATOPAGO_WEB_ORIGIN');
+
 /** Deployment settings, read once on the server; a missing or invalid one fails the build. */
 export const settings: ClientSettings = {
-  businessOrigin: origin('GATOPAGO_BUSINESS_ORIGIN'),
-  webOrigin: origin('GATOPAGO_WEB_ORIGIN'),
+  businessOrigin,
+  webOrigin,
+  passkeyRpId: passkeyRpId(webOrigin, businessOrigin),
   apiOrigin: origin('GATOPAGO_API_ORIGIN'),
   homeNetwork,
   rpcUrls,

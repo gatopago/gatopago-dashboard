@@ -7,6 +7,9 @@ import { networkName, shortAddress } from '../lib/format';
 import { useConsole, useFlow, useFlowAction } from './Console';
 import { CopyButton, PageHeader } from './Primitives';
 
+/** How many charges Flow lists at most (`GET /v1/payment_intents`). */
+const FLOW_PAGE = 100;
+
 export function Overview() {
   const { settings, english: en } = useConsole();
   const flow = useFlowAction();
@@ -23,8 +26,11 @@ export function Overview() {
   -H "Content-Type: application/json" \\
   -H "Idempotency-Key: order-A-1042" \\
   -d '{"amount":"25.00","description":"Order A-1042"}'`;
-  const paid = charges.data?.data.filter((intent) => intent.status === 'succeeded').length;
-  const stats: [string, number | undefined, string][] = [
+  // Flow lists the latest 100 charges: when it returns that many, older paid ones may exist.
+  const latest = charges.data?.data;
+  const paidCount = latest?.filter((intent) => intent.status === 'succeeded').length;
+  const paid = latest?.length === FLOW_PAGE ? `${paidCount}+` : paidCount;
+  const stats: [string, number | string | undefined, string][] = [
     [en ? 'Paid charges' : 'Cobros pagados', paid, '/payments'],
     [en ? 'API keys' : 'Claves API', keys.data?.data.length, '/keys'],
     ['Webhooks', hooks.data?.data.length, '/webhooks'],

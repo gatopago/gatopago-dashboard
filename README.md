@@ -44,6 +44,7 @@ missing required one fails the build.
 | -------------------------- | -------- | -------------------------------------------------------- | -------------------------------------------------------------------------- |
 | `GATOPAGO_BUSINESS_ORIGIN` | yes      | This console's origin                                    | `https://business.gatopago.com`                                            |
 | `GATOPAGO_WEB_ORIGIN`      | yes      | The GatoPago app: the passkeys' domain and the QR's link | `https://gatopago.com`                                                     |
+| `GATOPAGO_PASSKEY_RP_ID`   | no       | The passkeys' domain when the app sets one               | The web's `GATOPAGO_PASSKEY_RP_ID`; empty uses the app's domain            |
 | `GATOPAGO_API_ORIGIN`      | yes      | Wallet Core (sign-in) and Flow (data)                    | `https://api.gatopago.com`                                                 |
 | `GATOPAGO_HOME_NETWORK`    | yes      | Where merchants receive; accounts are read there         | Flow's `HOME_NETWORK`                                                      |
 | `GATOPAGO_WALLET_RPC_URLS` | no       | `{"<network>": "<url>"}`: RPC for the browser's reads    | The web's Alchemy app, with `business.gatopago.com` added to its allowlist |

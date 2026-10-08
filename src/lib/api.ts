@@ -49,6 +49,10 @@ const messages: Record<string, [es: string, en: string]> = {
     'Se canceló la confirmación en tu dispositivo. Puedes reintentar.',
     'Confirmation was cancelled on your device. You can try again.',
   ],
+  PASSKEY_WITHOUT_PRF: [
+    'No encontramos tu cuenta con esta llave en este dispositivo. Entra con el QR desde la app o con tu llave de respaldo.',
+    'We could not find your account with this key on this device. Sign in with the QR from the app, or with your backup key.',
+  ],
   ACCOUNT_NOT_FOUND: [
     'Esa llave no pertenece a una cuenta de GatoPago. Crea tu cuenta en la app primero.',
     'That key does not belong to a GatoPago account. Create your account in the app first.',

@@ -18,14 +18,8 @@ importers:
         specifier: file:vendor/gatopago-brand-3.2.0.tgz
         version: file:vendor/gatopago-brand-3.2.0.tgz
       '@gatopago/shared':
-        specifier: file:vendor/gatopago-shared-6.4.0.tgz
-        version: file:vendor/gatopago-shared-6.4.0.tgz(debug@4.4.3)(typescript@6.0.3)(zod@4.6.5)
-      '@scure/bip32':
-        specifier: 1.7.0
-        version: 1.7.0
-      '@scure/bip39':
-        specifier: 1.6.0
-        version: 1.6.0
+        specifier: file:vendor/gatopago-shared-6.13.0.tgz
+        version: file:vendor/gatopago-shared-6.13.0.tgz(@category-labs/mera@0.2.0(viem@2.55.19(typescript@6.0.3)(zod@4.6.5)))(debug@4.4.3)(typescript@6.0.3)(zod@4.6.5)
       next:
         specifier: 16.3.6
         version: 16.3.6(@babel/core@7.29.7)(@types/node@24.19.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -249,10 +243,15 @@ packages:
     resolution: {integrity: sha512-9ScKf37QVJvZdDn2lsultKgXC1rcSuVCte1njOVTSyKVoaFUVmDPVe41OEqAfJg60SamdIKInjPWbEjosdfAFw==, tarball: file:vendor/gatopago-brand-3.2.0.tgz}
     version: 3.2.0
 
-  '@gatopago/shared@file:vendor/gatopago-shared-6.4.0.tgz':
-    resolution: {integrity: sha512-POBCZOBh7tx+J6212Q5mpzHlIIJzZHmU/07haaq6+h907At2ZvR4O+PNY3sr+VB7xXi16jwIbKl50DODkBR78w==, tarball: file:vendor/gatopago-shared-6.4.0.tgz}
-    version: 6.4.0
+  '@gatopago/shared@file:vendor/gatopago-shared-6.13.0.tgz':
+    resolution: {integrity: sha512-W0LifAYnru/OoBepC+LLs4ZX/RfufMBM3T0qU7wIkbjXKeXvCJeZmEgyFOA1tte4rgrbqM8A94yPhuRt8PrWKA==, tarball: file:vendor/gatopago-shared-6.13.0.tgz}
+    version: 6.13.0
     engines: {node: '>=24'}
+    peerDependencies:
+      '@category-labs/mera': 0.2.0
+    peerDependenciesMeta:
+      '@category-labs/mera':
+        optional: true
 
   '@humanfs/core@0.19.2':
     resolution: {integrity: sha512-UhXNm+CFMWcbChXywFwkmhqjs3PRCmcSa/hfBgLIb7oQ5HNb1wS0icWsGtSAUNgefHeI+eBrA8I1fxmbHsGdvA==}
@@ -2085,10 +2084,15 @@ snapshots:
 
   '@gatopago/brand@file:vendor/gatopago-brand-3.2.0.tgz': {}
 
-  '@gatopago/shared@file:vendor/gatopago-shared-6.4.0.tgz(debug@4.4.3)(typescript@6.0.3)(zod@4.6.5)':
+  '@gatopago/shared@file:vendor/gatopago-shared-6.13.0.tgz(@category-labs/mera@0.2.0(viem@2.55.19(typescript@6.0.3)(zod@4.6.5)))(debug@4.4.3)(typescript@6.0.3)(zod@4.6.5)':
     dependencies:
+      '@scure/bip32': 1.7.0
+      '@scure/bip39': 1.6.0
       '@stellar/stellar-sdk': 17.2.0(debug@4.4.3)
+      ox: 0.14.34(typescript@6.0.3)(zod@4.6.5)
       viem: 2.55.19(typescript@6.0.3)(zod@4.6.5)
+    optionalDependencies:
+      '@category-labs/mera': 0.2.0(viem@2.55.19(typescript@6.0.3)(zod@4.6.5))
     transitivePeerDependencies:
       - bufferutil
       - debug
