@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, type ReactNode } from 'react';
-import { statusLabel, type Intent } from '../lib/format';
+import { useTranslations } from 'next-intl';
+import { statusTone, type Intent } from '../lib/format';
 
 /** A section's title, with an optional action on its right. */
 export function PageHeader({
@@ -26,9 +27,9 @@ export function PageHeader({
   );
 }
 
-export function Status({ status, english: en }: { status: Intent['status']; english: boolean }) {
-  const [label, tone] = statusLabel(status, en);
-  return <span className={`chip shrink-0 ${tone}`}>{label}</span>;
+export function Status({ status }: { status: Intent['status'] }) {
+  const t = useTranslations('Status');
+  return <span className={`chip shrink-0 ${statusTone[status]}`}>{t(status)}</span>;
 }
 
 export function Row({ label, children }: { label: string; children: ReactNode }) {
@@ -44,14 +45,13 @@ export function Row({ label, children }: { label: string; children: ReactNode })
 export function CopyButton({
   value,
   label,
-  english: en,
   className = 'btn btn-ghost btn-sm',
 }: {
   value: string;
   label?: string;
-  english: boolean;
   className?: string;
 }) {
+  const t = useTranslations('Common');
   const [copied, setCopied] = useState(false);
   return (
     <button
@@ -64,25 +64,22 @@ export function CopyButton({
         })
       }
     >
-      {copied ? (en ? 'Copied ✓' : 'Copiado ✓') : (label ?? (en ? 'Copy' : 'Copiar'))}
+      {copied ? t('copied') : (label ?? t('copy'))}
     </button>
   );
 }
 
 /** A secret Flow returns only once, when it is created. */
-export function OneTimeSecret({ value, english: en }: { value: string; english: boolean }) {
+export function OneTimeSecret({ value }: { value: string }) {
+  const t = useTranslations('Common');
   return (
     <div
       className="mb-6 border-y border-r border-l-4 border-pending bg-pending/8 p-4"
       role="status"
     >
-      <p className="text-[13px] font-semibold text-pending">
-        {en
-          ? 'Copy it now: it will not be shown again.'
-          : 'Cópiala ahora: no se volverá a mostrar.'}
-      </p>
+      <p className="text-[13px] font-semibold text-pending">{t('copyNow')}</p>
       <code className="mt-2 block font-mono text-[13px] break-all">{value}</code>
-      <CopyButton value={value} english={en} className="btn btn-ghost btn-sm mt-3" />
+      <CopyButton value={value} className="btn btn-ghost btn-sm mt-3" />
     </div>
   );
 }
@@ -92,15 +89,14 @@ export function ConfirmAction({
   label,
   confirmLabel,
   busy,
-  english: en,
   onConfirm,
 }: {
   label: string;
   confirmLabel: string;
   busy: boolean;
-  english: boolean;
   onConfirm: () => void;
 }) {
+  const t = useTranslations('Common');
   const [asking, setAsking] = useState(false);
   if (!asking)
     return (
@@ -114,7 +110,7 @@ export function ConfirmAction({
         {confirmLabel}
       </button>
       <button type="button" className="btn btn-ghost btn-sm" onClick={() => setAsking(false)}>
-        {en ? 'Cancel' : 'Cancelar'}
+        {t('cancel')}
       </button>
     </span>
   );

@@ -3,14 +3,15 @@
 import { useCallback, useEffect, useState, useSyncExternalStore } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { QRCodeSVG } from 'qrcode.react';
-import { failureMessage } from '../lib/api';
-import { setEnglish, useEnglish } from '../lib/language';
+import { useLocale, useTranslations } from 'next-intl';
+import { useFailureMessage } from '../lib/failure';
 import { safeNext } from '../lib/next';
 import { currentSession, subscribeSession } from '../lib/session';
 import type { ClientSettings } from '../lib/settings';
 import { collectLogin, requestLogin, type LoginRequest } from '../lib/signIn';
 import type { Hex } from 'viem';
 import { Brand, Meli } from './Brand';
+import { LanguageSwitch } from './LanguageSwitch';
 
 /** A QR renews itself this many times while the page is open, then waits for a tap. */
 const RENEWALS = 5;
@@ -18,14 +19,16 @@ const POLL_MS = 2000;
 
 export function Login({ settings }: { settings: ClientSettings }) {
   const router = useRouter();
-  const en = useEnglish();
+  const t = useTranslations('Login');
+  const locale = useLocale();
+  const messageFor = useFailureMessage();
   const next = safeNext(useSearchParams().get('next'));
   const session = useSyncExternalStore(subscribeSession, currentSession, () => undefined);
   const [request, setRequest] = useState<LoginRequest | null>(null);
   const [state, setState] = useState<'loading' | 'waiting' | 'expired' | 'approved'>('loading');
   const [renewals, setRenewals] = useState(0);
   const [failure, setFailure] = useState<unknown>(null);
-  const error = failure ? failureMessage(failure, en) : '';
+  const error = failure ? messageFor(failure) : '';
   const [passkeyBusy, setPasskeyBusy] = useState(false);
   /** This passkey's Business key, waiting for the app to approve it with the QR (once per passkey). */
   const [unapproved, setUnapproved] = useState<Hex | null>(null);
@@ -94,17 +97,7 @@ export function Login({ settings }: { settings: ClientSettings }) {
   }, []);
 
   const seconds = request ? Math.max(0, request.expires_at - Math.floor(now / 1000)) : 0;
-  const steps = en
-    ? [
-        'Open GatoPago on your phone.',
-        'Tap Scan and point at this code.',
-        'Confirm with your fingerprint or face.',
-      ]
-    : [
-        'Abre GatoPago en tu teléfono.',
-        'Toca Escanear y apunta a este código.',
-        'Confirma con tu huella o tu rostro.',
-      ];
+  const steps = [t('step1'), t('step2'), t('step3')];
 
   /** Signing in on this device with any GatoPago passkey: the account's kind is found, not asked. */
   const signInHere = () => {
@@ -131,13 +124,7 @@ export function Login({ settings }: { settings: ClientSettings }) {
         disabled={passkeyBusy}
         onClick={signInHere}
       >
-        {passkeyBusy
-          ? en
-            ? 'Confirm on your device…'
-            : 'Confirma en tu dispositivo…'
-          : en
-            ? 'Use my key on this device'
-            : 'Usar mi llave en este dispositivo'}
+        {passkeyBusy ? t('confirmOnDevice') : t('useKeyHere')}
       </button>
     </div>
   );
@@ -146,20 +133,14 @@ export function Login({ settings }: { settings: ClientSettings }) {
     <main className="mx-auto flex min-h-dvh max-w-[980px] flex-col px-5 py-6 md:px-10">
       <header className="flex items-center justify-between">
         <Brand />
-        <button type="button" className="btn-text text-[13px]" onClick={() => setEnglish(!en)}>
-          {en ? 'Español' : 'English'}
-        </button>
+        <LanguageSwitch className="btn-text text-[13px]" />
       </header>
       <div className="grid flex-1 items-center gap-10 py-10 md:grid-cols-[1fr_360px] md:gap-16">
         <section className="animate-fade-up">
-          <p className="kicker mb-4">{en ? 'Merchant console' : 'Consola para comercios'}</p>
-          <h1 className="text-[34px] md:text-[44px]">
-            {en ? 'Sign in to GatoPago Business' : 'Entra a GatoPago Negocios'}
-          </h1>
+          <p className="kicker mb-4">{t('kicker')}</p>
+          <h1 className="text-[34px] md:text-[44px]">{t('title')}</h1>
           <p className="mt-3 max-w-[46ch] text-[15px] leading-relaxed text-text-muted">
-            {en
-              ? 'Your charges, API keys and webhooks. You sign in with the GatoPago app: no passwords.'
-              : 'Tus cobros, claves API y webhooks. Entras con la app de GatoPago: sin contraseñas.'}
+            {t('copy')}
           </p>
           <ol className="mt-8 hidden flex-col gap-3 md:flex">
             {steps.map((step, index) => (
@@ -178,17 +159,13 @@ export function Login({ settings }: { settings: ClientSettings }) {
           {state === 'approved' ? (
             <div role="status" className="py-10">
               <Meli variant="head-happy" className="mx-auto mb-4 w-20" />
-              <p className="font-display text-[20px]">{en ? 'Approved!' : '¡Aprobado!'}</p>
-              <p className="mt-1 text-[14px] text-text-muted">
-                {en ? 'Signing you in…' : 'Entrando…'}
-              </p>
+              <p className="font-display text-[20px]">{t('approved')}</p>
+              <p className="mt-1 text-[14px] text-text-muted">{t('signingIn')}</p>
             </div>
           ) : state === 'expired' ? (
             <div className="py-8">
               <Meli variant="head-cautious" className="mx-auto mb-4 w-20" />
-              <p className="font-display text-[18px]">
-                {error || (en ? 'This code expired' : 'Este código venció')}
-              </p>
+              <p className="font-display text-[18px]">{error || t('codeExpired')}</p>
               <button
                 type="button"
                 className="btn btn-primary mt-5"
@@ -199,21 +176,17 @@ export function Login({ settings }: { settings: ClientSettings }) {
                   renew();
                 }}
               >
-                {en ? 'Show a new code' : 'Mostrar un código nuevo'}
+                {t('newCode')}
               </button>
             </div>
           ) : (
             <>
               {unapproved ? (
                 <p role="status" className="mb-4 max-w-[30ch] text-[14px] text-text-muted">
-                  {en
-                    ? 'First time with this key: scan the code with the GatoPago app to approve it. Next time, your fingerprint is enough.'
-                    : 'Primera vez con esta llave: escanea el código con la app de GatoPago para aprobarla. La próxima vez basta tu huella.'}
+                  {t('firstTimeKey')}
                 </p>
               ) : (
-                <p className="mb-4 text-[14px] text-text-muted md:hidden">
-                  {en ? 'Scan it with the GatoPago app' : 'Escanéalo con la app de GatoPago'}
-                </p>
+                <p className="mb-4 text-[14px] text-text-muted md:hidden">{t('scanWithApp')}</p>
               )}
               <div className="border-2 border-text bg-white p-3 shadow-[6px_6px_0_var(--color-cat-700)]">
                 {request && state === 'waiting' ? (
@@ -223,20 +196,14 @@ export function Login({ settings }: { settings: ClientSettings }) {
                     bgColor="#ffffff"
                     fgColor="#0A0A0B"
                     level="M"
-                    aria-label={en ? 'Sign-in code' : 'Código para entrar'}
+                    aria-label={t('codeLabel')}
                   />
                 ) : (
                   <div className="skeleton h-[232px] w-[232px]" aria-busy="true" />
                 )}
               </div>
               <p className="mt-5 text-[13px] text-text-faint" aria-live="off">
-                {state === 'waiting'
-                  ? en
-                    ? `Waiting for your phone · renews in ${seconds}\u00a0s`
-                    : `Esperando tu teléfono · se renueva en ${seconds}\u00a0s`
-                  : en
-                    ? 'Preparing the code…'
-                    : 'Preparando el código…'}
+                {state === 'waiting' ? t('waiting', { seconds }) : t('preparing')}
               </p>
             </>
           )}
@@ -256,9 +223,12 @@ export function Login({ settings }: { settings: ClientSettings }) {
         </p>
       ) : null}
       <footer className="mt-8 text-center text-[13px] text-text-muted">
-        {en ? 'No GatoPago account? ' : '¿No tienes cuenta de GatoPago? '}
-        <a href={`${settings.webOrigin}/login`} className="font-semibold text-text underline">
-          {en ? 'Create it in the app' : 'Créala en la app'}
+        {t('noAccount')}{' '}
+        <a
+          href={`${settings.webOrigin}${locale === 'en' ? '/en' : ''}/login`}
+          className="font-semibold text-text underline"
+        >
+          {t('createInApp')}
         </a>
       </footer>
     </main>

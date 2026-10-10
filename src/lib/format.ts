@@ -19,14 +19,14 @@ export interface Intent {
 }
 
 /** A Flow decimal amount ("25.00") in the console's language, with two to six decimals. */
-export const formatAmount = (amount: string, en: boolean) =>
-  Number(formatUnits(parseUnits(amount, 6), 6)).toLocaleString(en ? 'en' : 'es', {
+export const formatAmount = (amount: string, locale: string) =>
+  Number(formatUnits(parseUnits(amount, 6), 6)).toLocaleString(locale, {
     minimumFractionDigits: 2,
     maximumFractionDigits: 6,
   });
 
-export const formatDate = (seconds: number, en: boolean) =>
-  new Date(seconds * 1000).toLocaleString(en ? 'en' : 'es', {
+export const formatDate = (seconds: number, locale: string) =>
+  new Date(seconds * 1000).toLocaleString(locale, {
     day: 'numeric',
     month: 'short',
     hour: '2-digit',
@@ -42,12 +42,11 @@ export function explorerUrl(networkId: string, hash: Hex): string | null {
 
 export const shortAddress = (address: string) => `${address.slice(0, 6)}…${address.slice(-4)}`;
 
-export function statusLabel(status: Intent['status'], en: boolean): [label: string, tone: string] {
-  return {
-    requires_payment: [en ? 'Awaiting payment' : 'Esperando pago', 'bg-pending/10 text-pending'],
-    processing: [en ? 'Processing' : 'En proceso', 'bg-info/10 text-info'],
-    succeeded: [en ? 'Paid' : 'Pagado', 'bg-growth/15 text-growth'],
-    canceled: [en ? 'Canceled' : 'Cancelado', 'bg-surface-2 text-text-faint'],
-    expired: [en ? 'Expired' : 'Vencido', 'bg-surface-2 text-text-faint'],
-  }[status] as [string, string];
-}
+/** The colors of a charge's status; its name is in the `Status` texts. */
+export const statusTone: Record<Intent['status'], string> = {
+  requires_payment: 'bg-pending/10 text-pending',
+  processing: 'bg-info/10 text-info',
+  succeeded: 'bg-growth/15 text-growth',
+  canceled: 'bg-surface-2 text-text-faint',
+  expired: 'bg-surface-2 text-text-faint',
+};

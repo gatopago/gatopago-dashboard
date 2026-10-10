@@ -2,7 +2,8 @@
 
 import { useState, type ReactNode } from 'react';
 import Link from 'next/link';
-import { failureMessage } from '../lib/api';
+import { useLocale, useTranslations } from 'next-intl';
+import { useFailureMessage } from '../lib/failure';
 import { networkName, shortAddress } from '../lib/format';
 import { useConsole, useFlow, useFlowAction } from './Console';
 import { CopyButton, PageHeader } from './Primitives';
@@ -11,7 +12,10 @@ import { CopyButton, PageHeader } from './Primitives';
 const FLOW_PAGE = 100;
 
 export function Overview() {
-  const { settings, english: en } = useConsole();
+  const { settings } = useConsole();
+  const t = useTranslations('Overview');
+  const locale = useLocale();
+  const messageFor = useFailureMessage();
   const flow = useFlowAction();
   const merchant = useFlow<{ id: string; name: string | null; address: string }>('merchant');
   const keys = useFlow<{ data: unknown[] }>('api_keys');
@@ -31,21 +35,20 @@ export function Overview() {
   const paidCount = latest?.filter((intent) => intent.status === 'succeeded').length;
   const paid = latest?.length === FLOW_PAGE ? `${paidCount}+` : paidCount;
   const stats: [string, number | string | undefined, string][] = [
-    [en ? 'Paid charges' : 'Cobros pagados', paid, '/payments'],
-    [en ? 'API keys' : 'Claves API', keys.data?.data.length, '/keys'],
-    ['Webhooks', hooks.data?.data.length, '/webhooks'],
+    [t('paidCharges'), paid, '/payments'],
+    [t('keys'), keys.data?.data.length, '/keys'],
+    [t('webhooks'), hooks.data?.data.length, '/webhooks'],
   ];
+  const code = (chunks: ReactNode) => <code className="font-mono">{chunks}</code>;
+  const link = (href: string) => (chunks: ReactNode) => (
+    <Link href={href} className="-my-3 inline-block py-3 text-info underline">
+      {chunks}
+    </Link>
+  );
 
   return (
     <>
-      <PageHeader
-        title={en ? 'Overview' : 'Resumen'}
-        description={
-          en
-            ? 'Get paid in USDC from any wallet or GatoPago account. The money arrives straight in your account.'
-            : 'Cobra en USDC desde cualquier wallet o cuenta GatoPago. El dinero llega directo a tu cuenta.'
-        }
-      />
+      <PageHeader title={t('title')} description={t('description')} />
 
       <div className="mb-6 grid grid-cols-3 gap-3">
         {stats.map(([label, value, href]) => (
@@ -67,14 +70,14 @@ export function Overview() {
             setSaving(true);
             setNotice('');
             flow('merchant', { body: { name: shownName } })
-              .then(() => setNotice(en ? 'Saved ✓' : 'Guardado ✓'))
-              .catch((failure: unknown) => setNotice(failureMessage(failure, en)))
+              .then(() => setNotice(t('saved')))
+              .catch((failure: unknown) => setNotice(messageFor(failure)))
               .finally(() => setSaving(false));
           }}
         >
-          <h2 className="mb-1 text-[18px]">{en ? 'Your business' : 'Tu negocio'}</h2>
+          <h2 className="mb-1 text-[18px]">{t('business')}</h2>
           <label htmlFor="merchant-name" className="mb-1.5 block text-[13px] text-text-muted">
-            {en ? 'Name your customers see when paying' : 'Nombre que ven tus clientes al pagar'}
+            {t('nameLabel')}
           </label>
           <input
             id="merchant-name"
@@ -90,7 +93,7 @@ export function Overview() {
               disabled={saving || !shownName.trim()}
               className="btn btn-primary btn-sm"
             >
-              {saving ? (en ? 'Saving…' : 'Guardando…') : en ? 'Save' : 'Guardar'}
+              {saving ? t('saving') : t('save')}
             </button>
             {notice ? (
               <span role="status" className="text-[13px] text-text-muted">
@@ -100,67 +103,50 @@ export function Overview() {
           </div>
           {merchant.data ? (
             <p className="mt-5 border-t border-border pt-4 text-[13px] leading-relaxed text-text-muted">
-              {en
-                ? `Payments arrive at your GatoPago account on ${networkName(settings.homeNetwork)} (`
-                : `Los cobros llegan a tu cuenta GatoPago en ${networkName(settings.homeNetwork)} (`}
-              <code className="font-mono">{shortAddress(merchant.data.address)}</code>
-              {en
-                ? '). No custody: the money is yours from the first second.'
-                : '). Sin custodia: el dinero es tuyo desde el primer segundo.'}
+              {t.rich('arrives', {
+                network: networkName(settings.homeNetwork),
+                address: shortAddress(merchant.data.address),
+                code,
+              })}
             </p>
           ) : null}
         </form>
 
         <section className="card p-5">
-          <h2 className="mb-4 text-[18px]">
-            {en ? 'Integrate in three steps' : 'Intégralo en tres pasos'}
-          </h2>
+          <h2 className="mb-4 text-[18px]">{t('integrate')}</h2>
           <ol className="flex flex-col gap-4">
-            <Step index={1} title={en ? 'Create an API key' : 'Crea una clave API'}>
-              {en ? 'In ' : 'En '}
-              <Link href="/keys" className="-my-3 inline-block py-3 text-info underline">
-                {en ? 'API keys' : 'Claves API'}
-              </Link>
-              .
+            <Step index={1} title={t('keyTitle')}>
+              {t.rich('keyBody', { link: link('/keys') })}
             </Step>
-            <Step
-              index={2}
-              title={en ? 'Create a charge from your server' : 'Crea un cobro desde tu servidor'}
-            >
+            <Step index={2} title={t('chargeTitle')}>
               <div className="relative my-2">
                 <pre className="overflow-x-auto border border-border bg-surface-2 p-3 pr-20 font-mono text-[11px] leading-relaxed">
                   {curl}
                 </pre>
                 <CopyButton
                   value={curl}
-                  english={en}
                   className="btn btn-ghost btn-sm absolute top-2 right-2 !min-h-8 !px-2.5 text-[12px]"
                 />
               </div>
-              {en ? 'It returns a ' : 'Te devuelve un '}
-              <code className="font-mono">checkout_url</code>
-              {en ? ': the link or QR your customer pays.' : ': el link o QR que paga tu cliente.'}
+              {t.rich('chargeBody', { code })}
             </Step>
-            <Step index={3} title={en ? 'Receive the webhook' : 'Recibe el webhook'}>
-              {en ? 'Register your URL in ' : 'Registra tu URL en '}
-              <Link href="/webhooks" className="-my-3 inline-block py-3 text-info underline">
-                Webhooks
-              </Link>
-              {en ? '. When it is paid, a signed ' : '. Cuando se paga, te llega '}
-              <code className="font-mono">payment_intent.succeeded</code>
-              {en ? ' arrives.' : ' firmado.'}
+            <Step index={3} title={t('webhookTitle')}>
+              {t.rich('webhookBody', { link: link('/webhooks'), code })}
             </Step>
           </ol>
           <p className="mt-5 text-[13px] text-text-muted">
-            {en ? 'Full reference: ' : 'Referencia completa: '}
-            <a
-              href={`${settings.webOrigin}/docs`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="-my-3 inline-block py-3 text-info underline"
-            >
-              {en ? 'documentation ↗' : 'documentación ↗'}
-            </a>
+            {t.rich('reference', {
+              link: (chunks) => (
+                <a
+                  href={`${settings.webOrigin}${locale === 'en' ? '/en' : ''}/docs`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="-my-3 inline-block py-3 text-info underline"
+                >
+                  {chunks}
+                </a>
+              ),
+            })}
           </p>
         </section>
       </div>

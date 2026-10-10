@@ -53,3 +53,9 @@ missing required one fails the build.
 
 Wallet Core and Flow accept this console's origin through their `BUSINESS_ORIGIN` variable. Pages
 are served with a per-request CSP nonce that allows connections only to the API. `@gatopago/shared` and `@gatopago/brand` come from `vendor/`.
+
+Texts are in Spanish and English with [next-intl](https://next-intl.dev) and its plugin, one catalog
+per language in `src/messages/{es,en}.json`, with keys checked when compiling. The console is
+private, so its language is the member's choice, not part of its addresses: the menu keeps it in a
+cookie (`NEXT_LOCALE`, `src/i18n/locale.ts`) and the server renders the page again in it (Spanish by
+default). `test/messages.test.ts` keeps both languages with the same keys and values.

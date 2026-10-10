@@ -1,8 +1,8 @@
-import type { Metadata } from 'next';
+import { pageTitle } from '../../../../i18n/title';
 import { notFound } from 'next/navigation';
 import { PaymentDetail } from '../../../../components/Payments';
 
-export const metadata: Metadata = { title: 'Cobro' };
+export const generateMetadata = pageTitle('payment');
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

@@ -1,5 +1,7 @@
 allowBuilds:
   '@firebase/util': false
+  '@parcel/watcher': false
+  '@swc/core': false
   protobufjs: false
 
 minimumReleaseAge: 10080

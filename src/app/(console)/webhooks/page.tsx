@@ -1,7 +1,7 @@
-import type { Metadata } from 'next';
+import { pageTitle } from '../../../i18n/title';
 import { Webhooks } from '../../../components/Developers';
 
-export const metadata: Metadata = { title: 'Webhooks' };
+export const generateMetadata = pageTitle('webhooks');
 
 export default function Page() {
   return <Webhooks />;

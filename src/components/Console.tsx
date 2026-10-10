@@ -10,17 +10,18 @@ import {
 } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { api, failureMessage } from '../lib/api';
+import { useTranslations } from 'next-intl';
+import { api } from '../lib/api';
+import { useFailureMessage } from '../lib/failure';
 import { shortAddress } from '../lib/format';
-import { setEnglish, useEnglish } from '../lib/language';
 import { currentSession, signOut, subscribeSession, type Session } from '../lib/session';
 import type { ClientSettings } from '../lib/settings';
 import { Brand } from './Brand';
+import { LanguageSwitch } from './LanguageSwitch';
 
 interface ConsoleContextValue {
   settings: ClientSettings;
   session: Session;
-  english: boolean;
 }
 
 const ConsoleContext = createContext<ConsoleContextValue | null>(null);
@@ -33,18 +34,18 @@ export function useConsole(): ConsoleContextValue {
 
 /** Reads `path` from Flow (`/v1/…`) on mount and whenever `revision` changes. */
 export function useFlow<T>(path: string, revision = 0) {
-  const { settings, session, english: en } = useConsole();
+  const { settings, session } = useConsole();
+  const messageFor = useFailureMessage();
   const [state, setState] = useState<{ data: T | null; error: string }>({ data: null, error: '' });
   useEffect(() => {
     const controller = new AbortController();
     api<T>(settings.apiOrigin, `/v1/${path}`, { token: session.token, signal: controller.signal })
       .then((data) => setState({ data, error: '' }))
       .catch((failure: unknown) => {
-        if (!controller.signal.aborted)
-          setState({ data: null, error: failureMessage(failure, en) });
+        if (!controller.signal.aborted) setState({ data: null, error: messageFor(failure) });
       });
     return () => controller.abort();
-  }, [settings, session, en, path, revision]);
+  }, [settings, session, messageFor, path, revision]);
   return state;
 }
 
@@ -55,13 +56,13 @@ export function useFlowAction() {
     api<T>(settings.apiOrigin, `/v1/${path}`, { ...init, token: session.token });
 }
 
-const SECTIONS: [path: string, es: string, en: string][] = [
-  ['/', 'Resumen', 'Overview'],
-  ['/payments', 'Cobros', 'Payments'],
-  ['/keys', 'Claves API', 'API keys'],
-  ['/webhooks', 'Webhooks', 'Webhooks'],
-  ['/events', 'Eventos', 'Events'],
-];
+const SECTIONS = [
+  ['/', 'overview'],
+  ['/payments', 'payments'],
+  ['/keys', 'keys'],
+  ['/webhooks', 'webhooks'],
+  ['/events', 'events'],
+] as const;
 
 /**
  * The signed-in console: its sections beside the content on wide screens, above it on phones.
@@ -70,7 +71,7 @@ const SECTIONS: [path: string, es: string, en: string][] = [
 export function Console({ settings, children }: { settings: ClientSettings; children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const en = useEnglish();
+  const t = useTranslations('Console');
   const session = useSyncExternalStore(subscribeSession, currentSession, () => undefined);
   useEffect(() => {
     if (session === null)
@@ -85,19 +86,19 @@ export function Console({ settings, children }: { settings: ClientSettings; chil
     );
   const section = (path: string) =>
     path === '/' ? pathname === '/' : pathname === path || pathname.startsWith(`${path}/`);
-  const links = SECTIONS.map(([path, es, english]) => (
+  const links = SECTIONS.map(([path, name]) => (
     <Link
       key={path}
       href={path}
       aria-current={section(path) ? 'page' : undefined}
       className="nav-link"
     >
-      {en ? english : es}
+      {t(name)}
     </Link>
   ));
   const account = (
     <div className="flex flex-col gap-1 text-[13px]">
-      <span className="text-text-faint">{en ? 'Payments arrive at' : 'Los cobros llegan a'}</span>
+      <span className="text-text-faint">{t('paymentsArriveAt')}</span>
       <a
         href={settings.webOrigin}
         target="_blank"
@@ -107,27 +108,21 @@ export function Console({ settings, children }: { settings: ClientSettings; chil
         {shortAddress(session.address)}
       </a>
       <div className="mt-3 flex items-center gap-1">
-        <button
-          type="button"
-          className="btn-text -ml-3 text-[13px]"
-          onClick={() => setEnglish(!en)}
-        >
-          {en ? 'Español' : 'English'}
-        </button>
+        <LanguageSwitch className="btn-text -ml-3 text-[13px]" />
         <button type="button" className="btn-text text-[13px]" onClick={signOut}>
-          {en ? 'Sign out' : 'Cerrar sesión'}
+          {t('signOut')}
         </button>
       </div>
     </div>
   );
   return (
-    <ConsoleContext value={{ settings, session, english: en }}>
+    <ConsoleContext value={{ settings, session }}>
       <div className="mx-auto flex min-h-dvh max-w-[1200px] flex-col md:flex-row">
         <aside className="hidden w-60 shrink-0 flex-col gap-8 border-r border-border px-5 py-7 md:flex">
           <Link href="/" aria-label="GatoPago Negocios">
             <Brand />
           </Link>
-          <nav aria-label={en ? 'Sections' : 'Secciones'} className="flex flex-col gap-1.5">
+          <nav aria-label={t('sectionsLabel')} className="flex flex-col gap-1.5">
             {links}
           </nav>
           <div className="mt-auto">{account}</div>
@@ -139,10 +134,7 @@ export function Console({ settings, children }: { settings: ClientSettings; chil
               <Brand />
             </Link>
           </div>
-          <nav
-            aria-label={en ? 'Sections' : 'Secciones'}
-            className="flex flex-wrap gap-2 px-4 pb-3"
-          >
+          <nav aria-label={t('sectionsLabel')} className="flex flex-wrap gap-2 px-4 pb-3">
             {links}
           </nav>
         </header>

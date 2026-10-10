@@ -1,7 +1,7 @@
-import type { Metadata } from 'next';
+import { pageTitle } from '../../../i18n/title';
 import { Payments } from '../../../components/Payments';
 
-export const metadata: Metadata = { title: 'Cobros' };
+export const generateMetadata = pageTitle('payments');
 
 export default function Page() {
   return <Payments />;

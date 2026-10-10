@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
-import { failureMessage } from '../lib/api';
+import { useState, type ReactNode } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
+import { useFailureMessage } from '../lib/failure';
 import { formatDate } from '../lib/format';
-import { useConsole, useFlow, useFlowAction } from './Console';
+import { useFlow, useFlowAction } from './Console';
 import {
   ConfirmAction,
   Empty,
@@ -15,7 +16,7 @@ import {
 
 /** Runs a change through Flow, then reads the list again. */
 function useChange() {
-  const { english: en } = useConsole();
+  const messageFor = useFailureMessage();
   const [revision, setRevision] = useState(0);
   const [busy, setBusy] = useState(false),
     [error, setError] = useState('');
@@ -24,14 +25,15 @@ function useChange() {
     setError('');
     action()
       .then(() => setRevision((value) => value + 1))
-      .catch((failure: unknown) => setError(failureMessage(failure, en)))
+      .catch((failure: unknown) => setError(messageFor(failure)))
       .finally(() => setBusy(false));
   };
   return { revision, busy, error, run };
 }
 
 export function ApiKeys() {
-  const { english: en } = useConsole();
+  const t = useTranslations('Keys');
+  const locale = useLocale();
   const flow = useFlowAction();
   const { revision, busy, error: actionError, run } = useChange();
   const { data, error } = useFlow<{ data: { id: string; last4: string; created_at: number }[] }>(
@@ -42,12 +44,8 @@ export function ApiKeys() {
   return (
     <>
       <PageHeader
-        title={en ? 'API keys' : 'Claves API'}
-        description={
-          en
-            ? 'Your server uses a key to create charges and read events. Keep it secret: anyone with it can create charges in your name.'
-            : 'Tu servidor usa una clave para crear cobros y leer eventos. Guárdala en secreto: con ella se pueden crear cobros a tu nombre.'
-        }
+        title={t('title')}
+        description={t('description')}
         action={
           <button
             type="button"
@@ -59,18 +57,18 @@ export function ApiKeys() {
               )
             }
           >
-            {en ? 'Create API key' : 'Crear clave API'}
+            {t('create')}
           </button>
         }
       />
-      {created ? <OneTimeSecret value={created} english={en} /> : null}
+      {created ? <OneTimeSecret value={created} /> : null}
       {actionError ? <Failure>{actionError}</Failure> : null}
       {error ? (
         <Failure>{error}</Failure>
       ) : !data ? (
         <RowsLoading count={2} />
       ) : data.data.length === 0 ? (
-        <Empty>{en ? 'No keys yet.' : 'Todavía no hay claves.'}</Empty>
+        <Empty>{t('empty')}</Empty>
       ) : (
         <div className="card divide-y divide-border">
           {data.data.map((key) => (
@@ -78,15 +76,13 @@ export function ApiKeys() {
               <div className="min-w-0 flex-1">
                 <p className="font-mono text-[14px]">sk_…{key.last4}</p>
                 <p className="text-[12px] text-text-faint">
-                  {en ? 'Created ' : 'Creada el '}
-                  {formatDate(key.created_at, en)}
+                  {t('created', { date: formatDate(key.created_at, locale) })}
                 </p>
               </div>
               <ConfirmAction
-                label={en ? 'Revoke' : 'Revocar'}
-                confirmLabel={en ? 'Yes, revoke' : 'Sí, revocar'}
+                label={t('revoke')}
+                confirmLabel={t('confirmRevoke')}
                 busy={busy}
-                english={en}
                 onConfirm={() => run(() => flow(`api_keys/${key.id}`, { method: 'DELETE' }))}
               />
             </div>
@@ -98,7 +94,8 @@ export function ApiKeys() {
 }
 
 export function Webhooks() {
-  const { english: en } = useConsole();
+  const t = useTranslations('Webhooks');
+  const locale = useLocale();
   const flow = useFlowAction();
   const { revision, busy, error: actionError, run } = useChange();
   const { data, error } = useFlow<{ data: { id: string; url: string; created_at: number }[] }>(
@@ -110,20 +107,12 @@ export function Webhooks() {
   return (
     <>
       <PageHeader
-        title="Webhooks"
-        description={
-          <>
-            {en
-              ? 'GatoPago sends every event to your URLs, signed in the '
-              : 'GatoPago envía cada evento a tus URLs, firmado en el encabezado '}
-            <code className="font-mono">GatoPago-Signature</code>
-            {en
-              ? ' header (HMAC-SHA256 with the endpoint secret). Failed deliveries are retried up to 10 times.'
-              : ' (HMAC-SHA256 con el secreto del endpoint). Si una entrega falla, se reintenta hasta 10 veces.'}
-          </>
-        }
+        title={t('title')}
+        description={t.rich('description', {
+          code: (chunks: ReactNode) => <code className="font-mono">{chunks}</code>,
+        })}
       />
-      {secret ? <OneTimeSecret value={secret} english={en} /> : null}
+      {secret ? <OneTimeSecret value={secret} /> : null}
       <form
         className="mb-6 flex flex-col gap-2 md:flex-row"
         onSubmit={(event) => {
@@ -140,18 +129,14 @@ export function Webhooks() {
           type="url"
           required
           inputMode="url"
-          placeholder={
-            en
-              ? 'https://your-server.com/webhooks/gatopago'
-              : 'https://tu-servidor.com/webhooks/gatopago'
-          }
-          aria-label={en ? 'Endpoint URL' : 'URL del endpoint'}
+          placeholder={t('placeholder')}
+          aria-label={t('urlLabel')}
           value={url}
           onChange={(event) => setUrl(event.target.value)}
           className="field min-w-0 flex-1"
         />
         <button type="submit" disabled={busy || !url} className="btn btn-primary shrink-0">
-          {en ? 'Add endpoint' : 'Agregar endpoint'}
+          {t('add')}
         </button>
       </form>
       {actionError ? <Failure>{actionError}</Failure> : null}
@@ -160,24 +145,21 @@ export function Webhooks() {
       ) : !data ? (
         <RowsLoading count={2} />
       ) : data.data.length === 0 ? (
-        <Empty>
-          {en
-            ? 'No endpoints yet. Add the URL where your server listens.'
-            : 'Todavía no hay endpoints. Agrega la URL donde escucha tu servidor.'}
-        </Empty>
+        <Empty>{t('empty')}</Empty>
       ) : (
         <div className="card divide-y divide-border">
           {data.data.map((endpoint) => (
             <div key={endpoint.id} className="flex flex-wrap items-center gap-3 px-4 py-3">
               <div className="min-w-0 flex-1">
                 <p className="truncate font-mono text-[13px]">{endpoint.url}</p>
-                <p className="text-[12px] text-text-faint">{formatDate(endpoint.created_at, en)}</p>
+                <p className="text-[12px] text-text-faint">
+                  {formatDate(endpoint.created_at, locale)}
+                </p>
               </div>
               <ConfirmAction
-                label={en ? 'Remove' : 'Eliminar'}
-                confirmLabel={en ? 'Yes, remove' : 'Sí, eliminar'}
+                label={t('remove')}
+                confirmLabel={t('confirmRemove')}
                 busy={busy}
-                english={en}
                 onConfirm={() =>
                   run(() => flow(`webhook_endpoints/${endpoint.id}`, { method: 'DELETE' }))
                 }
@@ -192,20 +174,22 @@ export function Webhooks() {
 
 type Delivery = { attempts: number; delivered_at: number | null; last_status: number | null };
 
-function deliveryLabel(deliveries: Delivery[], en: boolean): [string, string] {
-  if (deliveries.length === 0) return [en ? 'No endpoints' : 'Sin endpoints', 'text-text-faint'];
+/** How an event's deliveries went: its text in `Events`, and its color. */
+function deliveryStatus(deliveries: Delivery[]) {
+  if (deliveries.length === 0) return { label: 'noEndpoints', tone: 'text-text-faint' } as const;
   if (deliveries.every((delivery) => delivery.delivered_at))
-    return [en ? 'Delivered' : 'Entregado', 'text-growth'];
+    return { label: 'delivered', tone: 'text-growth' } as const;
   if (deliveries.some((delivery) => delivery.attempts >= 10))
-    return [en ? 'Failed' : 'Falló', 'text-danger'];
+    return { label: 'failed', tone: 'text-danger' } as const;
   const attempts = Math.max(...deliveries.map((delivery) => delivery.attempts));
   return attempts === 0
-    ? [en ? 'Sending' : 'Enviando', 'text-info']
-    : [en ? `Retrying (${attempts})` : `Reintentando (${attempts})`, 'text-pending'];
+    ? ({ label: 'sending', tone: 'text-info' } as const)
+    : ({ label: 'retrying', tone: 'text-pending', attempts } as const);
 }
 
 export function Events() {
-  const { english: en } = useConsole();
+  const t = useTranslations('Events');
+  const locale = useLocale();
   const flow = useFlowAction();
   const { revision, busy, error: actionError, run } = useChange();
   const { data, error } = useFlow<{
@@ -213,35 +197,32 @@ export function Events() {
   }>('events', revision);
   return (
     <>
-      <PageHeader
-        title={en ? 'Events' : 'Eventos'}
-        description={
-          en
-            ? 'The latest 100 events of your business and how each delivery went. Open one to see what was sent.'
-            : 'Los últimos 100 eventos de tu negocio y cómo fue cada entrega. Abre uno para ver lo que se envió.'
-        }
-      />
+      <PageHeader title={t('title')} description={t('description')} />
       {actionError ? <Failure>{actionError}</Failure> : null}
       {error ? (
         <Failure>{error}</Failure>
       ) : !data ? (
         <RowsLoading count={6} />
       ) : data.data.length === 0 ? (
-        <Empty>{en ? 'No events yet.' : 'Todavía no hay eventos.'}</Empty>
+        <Empty>{t('empty')}</Empty>
       ) : (
         <div className="card divide-y divide-border">
           {data.data.map((event) => {
-            const [label, tone] = deliveryLabel(event.deliveries, en);
+            const status = deliveryStatus(event.deliveries);
             return (
               <details key={event.id} className="group px-4 py-3">
                 <summary className="flex min-h-11 cursor-pointer list-none items-center gap-3">
                   <span className="min-w-0 flex-1">
                     <span className="block truncate font-mono text-[13px]">{event.type}</span>
                     <span className="block text-[12px] text-text-faint">
-                      {formatDate(event.created_at, en)}
+                      {formatDate(event.created_at, locale)}
                     </span>
                   </span>
-                  <span className={`shrink-0 text-[12px] font-semibold ${tone}`}>{label}</span>
+                  <span className={`shrink-0 text-[12px] font-semibold ${status.tone}`}>
+                    {status.label === 'retrying'
+                      ? t('retrying', { attempts: status.attempts })
+                      : t(status.label)}
+                  </span>
                   <span
                     aria-hidden="true"
                     className="text-text-faint transition-transform group-open:rotate-90"
@@ -259,7 +240,7 @@ export function Events() {
                     className="btn btn-ghost btn-sm mt-3"
                     onClick={() => run(() => flow(`events/${event.id}/resend`, { body: {} }))}
                   >
-                    {busy ? (en ? 'Resending…' : 'Reenviando…') : en ? 'Resend' : 'Reenviar'}
+                    {busy ? t('resending') : t('resend')}
                   </button>
                 ) : null}
               </details>

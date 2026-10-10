@@ -1,7 +1,7 @@
-import type { Metadata } from 'next';
+import { pageTitle } from '../../../i18n/title';
 import { Events } from '../../../components/Developers';
 
-export const metadata: Metadata = { title: 'Eventos' };
+export const generateMetadata = pageTitle('events');
 
 export default function Page() {
   return <Events />;

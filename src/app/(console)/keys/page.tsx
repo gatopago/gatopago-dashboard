@@ -1,7 +1,7 @@
-import type { Metadata } from 'next';
+import { pageTitle } from '../../../i18n/title';
 import { ApiKeys } from '../../../components/Developers';
 
-export const metadata: Metadata = { title: 'Claves API' };
+export const generateMetadata = pageTitle('keys');
 
 export default function Page() {
   return <ApiKeys />;

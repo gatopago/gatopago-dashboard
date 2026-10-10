@@ -24,6 +24,7 @@
     "@gatopago/brand": "file:vendor/gatopago-brand-3.2.0.tgz",
     "@gatopago/shared": "file:vendor/gatopago-shared-6.22.0.tgz",
     "next": "16.3.8",
+    "next-intl": "4.14.9",
     "ox": "0.14.34",
     "qrcode.react": "4.2.0",
     "react": "19.2.8",

@@ -1,9 +1,9 @@
-import type { Metadata } from 'next';
+import { pageTitle } from '../../i18n/title';
 import { Suspense } from 'react';
 import { Login } from '../../components/Login';
 import { settings } from '../../lib/settings';
 
-export const metadata: Metadata = { title: 'Entrar' };
+export const generateMetadata = pageTitle('login');
 
 export default function Page() {
   return (
