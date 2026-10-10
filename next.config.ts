@@ -6,6 +6,8 @@ void settings;
 
 const config: NextConfig = {
   poweredByHeader: false,
+  // `next dev` would otherwise write AGENTS.md and CLAUDE.md into the repo.
+  agentRules: false,
   async headers() {
     return [{ source: '/:path*', headers: [{ key: 'X-Frame-Options', value: 'DENY' }] }];
   },

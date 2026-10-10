@@ -1,4 +1,4 @@
-import { signOut } from './session';
+import { currentSession, signOut } from './session';
 
 /** A GatoPago API error: its `error_code`, or `NETWORK_ERROR` when it could not be reached. */
 export class ApiError extends Error {
@@ -39,7 +39,14 @@ export async function api<T>(
     throw new ApiError(0, 'NETWORK_ERROR');
   }
   const value = await response.json().catch(() => null);
-  if (response.status === 401 && init.token && path.startsWith('/v1/')) signOut();
+  // Only the session in use: a late answer to an earlier one must not sign out the new one.
+  if (
+    response.status === 401 &&
+    init.token &&
+    init.token === currentSession()?.token &&
+    path.startsWith('/v1/')
+  )
+    signOut();
   if (!response.ok) throw new ApiError(response.status, value?.error_code ?? 'UNAVAILABLE');
   return value as T;
 }
@@ -50,8 +57,8 @@ const messages: Record<string, [es: string, en: string]> = {
     'Confirmation was cancelled on your device. You can try again.',
   ],
   PASSKEY_WITHOUT_PRF: [
-    'No encontramos tu cuenta con esta llave en este dispositivo. Entra con el QR desde la app o con tu llave de respaldo.',
-    'We could not find your account with this key on this device. Sign in with the QR from the app, or with your backup key.',
+    'Esta llave no sirve en este dispositivo. Entra con el QR desde la app, o con la llave guardada en tu teléfono (iCloud o Google).',
+    'This key does not work on this device. Sign in with the QR from the app, or with the key saved on your phone (iCloud or Google).',
   ],
   ACCOUNT_NOT_FOUND: [
     'Esa llave no pertenece a una cuenta de GatoPago. Crea tu cuenta en la app primero.',

@@ -81,9 +81,10 @@
     color: inherit;
     font: inherit;
   }
-  :where(button, a):focus-visible {
-    outline: 2px solid var(--color-cat-500);
-    outline-offset: 2px;
+  /* No focus outline anywhere, as in the app (Daniel, 08-10). */
+  :focus,
+  :focus-visible {
+    outline: none;
   }
   ::selection {
     background: rgb(248 82 57 / 0.32);
@@ -193,10 +194,6 @@
 .field::placeholder {
   color: var(--color-text-faint);
 }
-.field:focus {
-  outline: none;
-  box-shadow: 4px 4px 0 var(--color-cat-500);
-}
 
 .kicker {
   display: flex;
@@ -284,13 +281,6 @@
   color: var(--color-on-cat);
   font-weight: 700;
   box-shadow: 3px 3px 0 var(--color-cat-700);
-}
-.nav-row {
-  mask-image: linear-gradient(to right, black calc(100% - 32px), transparent);
-  scrollbar-width: none;
-}
-.nav-row::-webkit-scrollbar {
-  display: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

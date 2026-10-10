@@ -4,8 +4,6 @@ import {
   createContext,
   useContext,
   useEffect,
-  useLayoutEffect,
-  useRef,
   useState,
   useSyncExternalStore,
   type ReactNode,
@@ -74,15 +72,10 @@ export function Console({ settings, children }: { settings: ClientSettings; chil
   const pathname = usePathname();
   const en = useEnglish();
   const session = useSyncExternalStore(subscribeSession, currentSession, () => undefined);
-  const activeTab = useRef<HTMLAnchorElement>(null);
   useEffect(() => {
     if (session === null)
       router.replace(pathname === '/' ? '/login' : `/login?next=${encodeURIComponent(pathname)}`);
   }, [session, router, pathname]);
-  // On phones the current section scrolls into view in the row of sections.
-  useLayoutEffect(() => {
-    activeTab.current?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
-  }, [pathname, session]);
 
   if (!session)
     return (
@@ -96,7 +89,6 @@ export function Console({ settings, children }: { settings: ClientSettings; chil
     <Link
       key={path}
       href={path}
-      ref={section(path) ? activeTab : undefined}
       aria-current={section(path) ? 'page' : undefined}
       className="nav-link"
     >
@@ -140,7 +132,8 @@ export function Console({ settings, children }: { settings: ClientSettings; chil
           </nav>
           <div className="mt-auto">{account}</div>
         </aside>
-        <header className="sticky top-0 z-10 border-b border-border bg-canvas/95 backdrop-blur md:hidden">
+        {/* On phones every section stays in sight: they wrap instead of scrolling sideways. */}
+        <header className="border-b border-border md:hidden">
           <div className="px-4 pt-4 pb-3">
             <Link href="/" aria-label="GatoPago Negocios">
               <Brand />
@@ -148,7 +141,7 @@ export function Console({ settings, children }: { settings: ClientSettings; chil
           </div>
           <nav
             aria-label={en ? 'Sections' : 'Secciones'}
-            className="nav-row flex gap-2 overflow-x-auto pr-10 pb-3 pl-4"
+            className="flex flex-wrap gap-2 px-4 pb-3"
           >
             {links}
           </nav>

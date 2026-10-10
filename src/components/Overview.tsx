@@ -58,7 +58,8 @@ export function Overview() {
         ))}
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      {/* One column on phones, never wider than the screen (a code sample cannot stretch it). */}
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-2">
         <form
           className="card-strong p-5"
           onSubmit={(event) => {
@@ -117,7 +118,7 @@ export function Overview() {
           <ol className="flex flex-col gap-4">
             <Step index={1} title={en ? 'Create an API key' : 'Crea una clave API'}>
               {en ? 'In ' : 'En '}
-              <Link href="/keys" className="text-info underline">
+              <Link href="/keys" className="-my-3 inline-block py-3 text-info underline">
                 {en ? 'API keys' : 'Claves API'}
               </Link>
               .
@@ -142,7 +143,7 @@ export function Overview() {
             </Step>
             <Step index={3} title={en ? 'Receive the webhook' : 'Recibe el webhook'}>
               {en ? 'Register your URL in ' : 'Registra tu URL en '}
-              <Link href="/webhooks" className="text-info underline">
+              <Link href="/webhooks" className="-my-3 inline-block py-3 text-info underline">
                 Webhooks
               </Link>
               {en ? '. When it is paid, a signed ' : '. Cuando se paga, te llega '}
@@ -156,7 +157,7 @@ export function Overview() {
               href={`${settings.webOrigin}/docs`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-info underline"
+              className="-my-3 inline-block py-3 text-info underline"
             >
               {en ? 'documentation ↗' : 'documentación ↗'}
             </a>

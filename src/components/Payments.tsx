@@ -108,7 +108,7 @@ export function Payments() {
                   {intent.description ? ` · ${intent.description}` : ''}
                 </p>
               </div>
-              <span className="hidden font-mono text-[12px] text-text-faint md:block">
+              <span className="hidden min-w-0 shrink truncate font-mono text-[12px] text-text-faint lg:block">
                 {intent.id}
               </span>
               <Status status={intent.status} english={en} />
@@ -176,7 +176,7 @@ export function PaymentDetail({ id }: { id: string }) {
           </div>
           <Row label="ID">
             <span className="inline-flex items-center gap-2">
-              <code className="font-mono">{intent.id}</code>
+              <code className="min-w-0 break-all font-mono">{intent.id}</code>
               <CopyButton
                 value={intent.id}
                 english={en}
@@ -210,7 +210,7 @@ export function PaymentDetail({ id }: { id: string }) {
                     href={receipt}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-info underline"
+                    className="-my-3 inline-block py-3 text-info underline"
                   >
                     {en ? 'See it on the blockchain ↗' : 'Verla en la blockchain ↗'}
                   </a>

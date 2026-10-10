@@ -1,2 +1,2 @@
 * text=auto eol=lf
-vendor/*.tgz binary
+*.tgz binary

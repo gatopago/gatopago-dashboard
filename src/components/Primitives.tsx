@@ -56,7 +56,7 @@ export function CopyButton({
   return (
     <button
       type="button"
-      className={className}
+      className={`shrink-0 whitespace-nowrap ${className}`}
       onClick={() =>
         void navigator.clipboard.writeText(value).then(() => {
           setCopied(true);
