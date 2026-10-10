@@ -9,7 +9,6 @@ export function proxy(request: NextRequest) {
   const csp = documentCsp({
     nonce,
     apiOrigin: settings.apiOrigin,
-    rpcUrls: settings.rpcUrls,
     development: process.env.NODE_ENV === 'development',
     secure: request.nextUrl.protocol === 'https:',
   });

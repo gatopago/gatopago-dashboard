@@ -38,7 +38,12 @@ export async function api<T>(
     if (init.signal?.aborted) throw error;
     throw new ApiError(0, 'NETWORK_ERROR');
   }
-  const value = await response.json().catch(() => null);
+  // Every route answers a JSON object; anything else is not an answer to trust.
+  const value: unknown = await response.json().catch(() => undefined);
+  const body =
+    typeof value === 'object' && value !== null && !Array.isArray(value)
+      ? (value as { error_code?: unknown })
+      : null;
   // Only the session in use: a late answer to an earlier one must not sign out the new one.
   if (
     response.status === 401 &&
@@ -47,8 +52,13 @@ export async function api<T>(
     path.startsWith('/v1/')
   )
     signOut();
-  if (!response.ok) throw new ApiError(response.status, value?.error_code ?? 'UNAVAILABLE');
-  return value as T;
+  if (!response.ok)
+    throw new ApiError(
+      response.status,
+      typeof body?.error_code === 'string' ? body.error_code : 'UNAVAILABLE',
+    );
+  if (!body) throw new ApiError(response.status, 'INVALID_RESPONSE');
+  return body as T;
 }
 
 const messages: Record<string, [es: string, en: string]> = {

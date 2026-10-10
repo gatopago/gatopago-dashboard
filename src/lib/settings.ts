@@ -12,8 +12,6 @@ export interface ClientSettings {
   readonly apiOrigin: string;
   /** Where merchants receive; accounts are derived and read there. */
   readonly homeNetwork: string;
-  /** Optional RPC per network for the browser's reads; each falls back to the public one. */
-  readonly rpcUrls: Readonly<Record<string, string>>;
 }
 
 function required(name: string): string {
@@ -30,13 +28,6 @@ function origin(name: string): string {
 
 const homeNetwork = required('GATOPAGO_HOME_NETWORK');
 walletNetwork(homeNetwork);
-
-const rpcUrls: Record<string, string> = JSON.parse(
-  process.env.GATOPAGO_WALLET_RPC_URLS?.trim() || '{}',
-);
-for (const [id, url] of Object.entries(rpcUrls))
-  if (new URL(url).protocol !== 'https:')
-    throw new Error(`GATOPAGO_WALLET_RPC_URLS: invalid entry for ${id}`);
 
 /**
  * `GATOPAGO_PASSKEY_RP_ID`, as the app sets it (by default the app's domain); this console must be
@@ -60,5 +51,4 @@ export const settings: ClientSettings = {
   passkeyRpId: passkeyRpId(webOrigin, businessOrigin),
   apiOrigin: origin('GATOPAGO_API_ORIGIN'),
   homeNetwork,
-  rpcUrls,
 };

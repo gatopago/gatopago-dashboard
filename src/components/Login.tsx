@@ -9,6 +9,7 @@ import { safeNext } from '../lib/next';
 import { currentSession, subscribeSession } from '../lib/session';
 import type { ClientSettings } from '../lib/settings';
 import { collectLogin, requestLogin, type LoginRequest } from '../lib/signIn';
+import type { Hex } from 'viem';
 import { Brand, Meli } from './Brand';
 
 /** A QR renews itself this many times while the page is open, then waits for a tap. */
@@ -26,6 +27,8 @@ export function Login({ settings }: { settings: ClientSettings }) {
   const [failure, setFailure] = useState<unknown>(null);
   const error = failure ? failureMessage(failure, en) : '';
   const [passkeyBusy, setPasskeyBusy] = useState(false);
+  /** This passkey's Business key, waiting for the app to approve it with the QR (once per passkey). */
+  const [unapproved, setUnapproved] = useState<Hex | null>(null);
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
@@ -34,7 +37,7 @@ export function Login({ settings }: { settings: ClientSettings }) {
 
   // Asks Wallet Core for a new QR; callers show the loading state first.
   const renew = useCallback(() => {
-    requestLogin(settings)
+    requestLogin(settings, unapproved ?? undefined)
       .then((value) => {
         setRequest(value);
         setState('waiting');
@@ -43,7 +46,7 @@ export function Login({ settings }: { settings: ClientSettings }) {
         setFailure(failure);
         setState('expired');
       });
-  }, [settings]);
+  }, [settings, unapproved]);
 
   useEffect(renew, [renew]);
 
@@ -108,8 +111,16 @@ export function Login({ settings }: { settings: ClientSettings }) {
     setPasskeyBusy(true);
     setFailure(null);
     import('../lib/signInHere')
-      .then((signIn) => signIn.signInHere(settings))
-      .catch((failure: unknown) => setFailure(failure))
+      .then((signIn) =>
+        signIn.signInHere(settings).catch((failure: unknown) => {
+          // First time with this passkey: the next QR carries its key for the app to approve.
+          if (failure instanceof signIn.UnapprovedKey) {
+            setRenewals(0);
+            setState('loading');
+            setUnapproved(failure.publicKey);
+          } else setFailure(failure);
+        }),
+      )
       .finally(() => setPasskeyBusy(false));
   };
   const passkey = (
@@ -193,9 +204,17 @@ export function Login({ settings }: { settings: ClientSettings }) {
             </div>
           ) : (
             <>
-              <p className="mb-4 text-[14px] text-text-muted md:hidden">
-                {en ? 'Scan it with the GatoPago app' : 'Escanéalo con la app de GatoPago'}
-              </p>
+              {unapproved ? (
+                <p role="status" className="mb-4 max-w-[30ch] text-[14px] text-text-muted">
+                  {en
+                    ? 'First time with this key: scan the code with the GatoPago app to approve it. Next time, your fingerprint is enough.'
+                    : 'Primera vez con esta llave: escanea el código con la app de GatoPago para aprobarla. La próxima vez basta tu huella.'}
+                </p>
+              ) : (
+                <p className="mb-4 text-[14px] text-text-muted md:hidden">
+                  {en ? 'Scan it with the GatoPago app' : 'Escanéalo con la app de GatoPago'}
+                </p>
+              )}
               <div className="border-2 border-text bg-white p-3 shadow-[6px_6px_0_var(--color-cat-700)]">
                 {request && state === 'waiting' ? (
                   <QRCodeSVG

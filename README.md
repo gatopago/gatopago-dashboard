@@ -15,11 +15,14 @@ own endpoints refuse it). There are two ways in:
   their passkey: a SIWE message whose nonce is the request. The console polls with the request's
   secret, which never leaves this browser, and receives the session once. A request lasts two
   minutes; the QR renews itself a few times while the page is open.
-- **The same passkey:** passkeys belong to `gatopago.com`, and this console is a subdomain of it, so
-  the browser can use them here directly, or on a phone through its own QR (Bluetooth needed). The
-  account signs a SIWE message for this origin.
-- **Mera accounts:** their passkey's PRF output derives the key that owns the account, exactly as
-  the app derives it; the console derives it the same way, signs in, and ends the signing session.
+- **The same passkey, with its own key:** passkeys belong to `gatopago.com`, and this console is a
+  subdomain of it, so the browser can use them here directly, or on a phone through its own QR
+  (Bluetooth needed). The passkey's PRF output under a salt of its own (`BUSINESS_KEY_SALT`)
+  derives an Ed25519 Business key, never the keys that move the account's money; it signs a
+  single-use challenge (`POST /app/v1/business-login/key`). The first time, Wallet Core does not know
+  the key: the console shows the QR with the key inside, and approving it in the app binds that
+  key to the account. It counts until the member removes it in the app, which also ends its
+  sessions. The same passkey derives the same key on every device it syncs to.
 
 The passkey never leaves the device in either case.
 
@@ -40,15 +43,13 @@ Checks: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`.
 Every variable is public. Set them in Vercel (_Settings → Environment Variables_) and redeploy; a
 missing required one fails the build.
 
-| Name                       | Required | What it is                                               | How to get it                                                              |
-| -------------------------- | -------- | -------------------------------------------------------- | -------------------------------------------------------------------------- |
-| `GATOPAGO_BUSINESS_ORIGIN` | yes      | This console's origin                                    | `https://business.gatopago.com`                                            |
-| `GATOPAGO_WEB_ORIGIN`      | yes      | The GatoPago app: the passkeys' domain and the QR's link | `https://gatopago.com`                                                     |
-| `GATOPAGO_PASSKEY_RP_ID`   | no       | The passkeys' domain when the app sets one               | The web's `GATOPAGO_PASSKEY_RP_ID`; empty uses the app's domain            |
-| `GATOPAGO_API_ORIGIN`      | yes      | Wallet Core (sign-in) and Flow (data)                    | `https://api.gatopago.com`                                                 |
-| `GATOPAGO_HOME_NETWORK`    | yes      | Where merchants receive; accounts are read there         | Flow's `HOME_NETWORK`                                                      |
-| `GATOPAGO_WALLET_RPC_URLS` | no       | `{"<network>": "<url>"}`: RPC for the browser's reads    | The web's Alchemy app, with `business.gatopago.com` added to its allowlist |
+| Name                       | Required | What it is                                               | How to get it                                                   |
+| -------------------------- | -------- | -------------------------------------------------------- | --------------------------------------------------------------- |
+| `GATOPAGO_BUSINESS_ORIGIN` | yes      | This console's origin                                    | `https://business.gatopago.com`                                 |
+| `GATOPAGO_WEB_ORIGIN`      | yes      | The GatoPago app: the passkeys' domain and the QR's link | `https://gatopago.com`                                          |
+| `GATOPAGO_PASSKEY_RP_ID`   | no       | The passkeys' domain when the app sets one               | The web's `GATOPAGO_PASSKEY_RP_ID`; empty uses the app's domain |
+| `GATOPAGO_API_ORIGIN`      | yes      | Wallet Core (sign-in) and Flow (data)                    | `https://api.gatopago.com`                                      |
+| `GATOPAGO_HOME_NETWORK`    | yes      | Where merchants receive; accounts are read there         | Flow's `HOME_NETWORK`                                           |
 
 Wallet Core and Flow accept this console's origin through their `BUSINESS_ORIGIN` variable. Pages
-are served with a per-request CSP nonce that allows connections only to the API and the networks'
-RPCs. `@gatopago/shared` and `@gatopago/brand` come from `vendor/`.
+are served with a per-request CSP nonce that allows connections only to the API. `@gatopago/shared` and `@gatopago/brand` come from `vendor/`.

@@ -45,9 +45,10 @@ export function deviceLabel(userAgent: string): string {
   return system ? `${browser} · ${system}` : browser;
 }
 
-export const requestLogin = (settings: ClientSettings) =>
+/** A sign-in QR; with `publicKey`, approving it also approves that Business key (`signInHere`). */
+export const requestLogin = (settings: ClientSettings, publicKey?: Hex) =>
   api<LoginRequest>(settings.apiOrigin, '/app/v1/business-login', {
-    body: { device: deviceLabel(navigator.userAgent) },
+    body: { device: deviceLabel(navigator.userAgent), public_key: publicKey },
   });
 
 /** Asks once whether the app approved `request`; returns the session when it did. */

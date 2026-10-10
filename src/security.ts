@@ -1,23 +1,16 @@
-import { walletNetworks } from '@gatopago/shared/networks';
-
 /**
- * What the browser may reach: GatoPago's API (Wallet Core and Flow) and, for signing in with a
- * passkey, the home network's RPCs (the account's address and signature checks).
+ * What the browser may reach: GatoPago's API (Wallet Core and Flow) only. Signing in reads nothing
+ * from a chain: the console's key is checked by Wallet Core.
  */
 export function documentCsp(input: {
   nonce: string;
   apiOrigin: string;
-  rpcUrls: Readonly<Record<string, string>>;
   development: boolean;
   secure: boolean;
 }): string {
-  const rpcs = Object.values(walletNetworks).flatMap(({ chain }) =>
-    chain.rpcUrls.default.http.map((url) => new URL(url).origin),
-  );
   const connections = [
     "'self'",
     input.apiOrigin,
-    ...new Set([...rpcs, ...Object.values(input.rpcUrls).map((url) => new URL(url).origin)]),
     ...(input.development ? ['ws://localhost:3001'] : []),
   ];
   return [

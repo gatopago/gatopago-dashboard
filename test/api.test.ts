@@ -14,6 +14,22 @@ beforeEach(() => {
 });
 afterEach(() => vi.unstubAllGlobals());
 
+describe('an answer', () => {
+  it('that is not a JSON object is an error, not an empty success', async () => {
+    const { api } = await import('../src/lib/api');
+    for (const body of ['not valid json', '', 'null', '[1]']) {
+      vi.stubGlobal('fetch', async () => new Response(body, { status: 200 }));
+      await expect(api('https://api.gatopago.com', '/v1/charges')).rejects.toThrow(
+        'INVALID_RESPONSE',
+      );
+    }
+    vi.stubGlobal('fetch', async () => new Response('<html>', { status: 502 }));
+    await expect(api('https://api.gatopago.com', '/v1/charges')).rejects.toThrow('UNAVAILABLE');
+    vi.stubGlobal('fetch', async () => Response.json({ charges: [] }));
+    expect(await api('https://api.gatopago.com', '/v1/charges')).toEqual({ charges: [] });
+  });
+});
+
 describe('a rejected session', () => {
   it('signs out only when it is the one in use', async () => {
     const { api } = await import('../src/lib/api');
