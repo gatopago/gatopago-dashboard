@@ -59,3 +59,9 @@ per language in `src/messages/{es,en}.json`, with keys checked when compiling. T
 private, so its language is the member's choice, not part of its addresses: the menu keeps it in a
 cookie (`NEXT_LOCALE`, `src/i18n/locale.ts`) and the server renders the page again in it (Spanish by
 default). `test/messages.test.ts` keeps both languages with the same keys and values.
+
+## License
+
+The code is MIT-licensed (see [LICENSE](LICENSE)). The GatoPago name, logo and the Meli
+illustrations (`vendor/gatopago-brand-*.tgz`) are not covered by the MIT license. All rights
+reserved.
