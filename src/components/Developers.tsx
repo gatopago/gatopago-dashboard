@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
+import { useRef, useState, type ReactNode } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useFailureMessage } from '../lib/failure';
 import { formatDate } from '../lib/format';
@@ -14,19 +14,25 @@ import {
   RowsLoading,
 } from './Primitives';
 
-/** Runs a change through Flow, then reads the list again. */
+/** Runs a change through Flow, then reads the list again; a second tap while it runs does nothing. */
 function useChange() {
   const messageFor = useFailureMessage();
   const [revision, setRevision] = useState(0);
   const [busy, setBusy] = useState(false),
     [error, setError] = useState('');
+  const running = useRef(false);
   const run = (action: () => Promise<unknown>) => {
+    if (running.current) return;
+    running.current = true;
     setBusy(true);
     setError('');
     action()
       .then(() => setRevision((value) => value + 1))
       .catch((failure: unknown) => setError(messageFor(failure)))
-      .finally(() => setBusy(false));
+      .finally(() => {
+        running.current = false;
+        setBusy(false);
+      });
   };
   return { revision, busy, error, run };
 }
