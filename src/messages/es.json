@@ -2,7 +2,7 @@
   "Metadata": {
     "description": "Cobros en USDC, claves API y webhooks de tu negocio en GatoPago.",
     "login": "Entrar",
-    "payments": "Cobros",
+    "payments": "Cascabel",
     "payment": "Cobro",
     "keys": "Claves API",
     "webhooks": "Webhooks",
@@ -23,7 +23,7 @@
   "Console": {
     "sectionsLabel": "Secciones",
     "overview": "Resumen",
-    "payments": "Cobros",
+    "payments": "Cascabel",
     "keys": "Claves API",
     "webhooks": "Webhooks",
     "events": "Eventos",
@@ -45,7 +45,7 @@
   },
   "Login": {
     "kicker": "Consola para comercios",
-    "title": "Entra a GatoPago Negocios",
+    "title": "Entra a GatoPago Business",
     "copy": "Tus cobros, claves API y webhooks. Entras con la app de GatoPago: sin contraseñas.",
     "step1": "Abre GatoPago en tu teléfono.",
     "step2": "Toca Escanear y apunta a este código.",
@@ -86,14 +86,14 @@
     "reference": "Referencia completa: <link>documentación ↗</link>"
   },
   "Payments": {
-    "title": "Cobros",
-    "description": "Los cobros que creó tu servidor, del más reciente al más antiguo.",
+    "title": "Cascabel",
+    "description": "Tus cobros, del más reciente al más antiguo: los que creas desde la app y los que crea tu servidor.",
     "searchPlaceholder": "Buscar por id (pi_…) o descripción",
     "searchLabel": "Buscar por id o descripción",
     "filterLabel": "Filtrar por estado",
     "allStatuses": "Todos los estados",
     "noMatch": "Ningún cobro coincide con los filtros.",
-    "empty": "Todavía no hay cobros. Crea el primero desde tu servidor.",
+    "empty": "Todavía no hay cobros. Crea el primero desde la app («Cobrar») o desde tu servidor.",
     "latest": "Se muestran los últimos 100 cobros.",
     "all": "Todos los cobros",
     "descriptionLabel": "Descripción",

@@ -2,7 +2,7 @@
   "Metadata": {
     "description": "USDC payments, API keys and webhooks for your business on GatoPago.",
     "login": "Sign in",
-    "payments": "Payments",
+    "payments": "Cascabel",
     "payment": "Payment",
     "keys": "API keys",
     "webhooks": "Webhooks",
@@ -23,7 +23,7 @@
   "Console": {
     "sectionsLabel": "Sections",
     "overview": "Overview",
-    "payments": "Payments",
+    "payments": "Cascabel",
     "keys": "API keys",
     "webhooks": "Webhooks",
     "events": "Events",
@@ -86,14 +86,14 @@
     "reference": "Full reference: <link>documentation ↗</link>"
   },
   "Payments": {
-    "title": "Payments",
-    "description": "The charges your server created, newest first.",
+    "title": "Cascabel",
+    "description": "Your charges, newest first: the ones you create in the app and the ones your server creates.",
     "searchPlaceholder": "Search by id (pi_…) or description",
     "searchLabel": "Search by id or description",
     "filterLabel": "Filter by status",
     "allStatuses": "All statuses",
     "noMatch": "No charge matches the filters.",
-    "empty": "No charges yet. Create the first one from your server.",
+    "empty": "No charges yet. Create the first one from the app (“Request a payment”) or from your server.",
     "latest": "Showing the latest 100 charges.",
     "all": "All payments",
     "descriptionLabel": "Description",
