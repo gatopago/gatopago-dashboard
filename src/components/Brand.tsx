@@ -12,7 +12,7 @@ export function Brand({ className = '' }: { className?: string }) {
       <span className="leading-none">
         <strong className="block font-display text-[16px] tracking-[-0.03em]">GatoPago</strong>
         <span className="mt-0.5 block text-[10px] font-semibold tracking-[0.12em] text-cat-700 uppercase">
-          Negocios
+          Business
         </span>
       </span>
     </span>

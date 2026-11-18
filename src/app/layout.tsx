@@ -8,7 +8,7 @@ import './globals.css';
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('Metadata');
   return {
-    title: { default: 'GatoPago Negocios', template: '%s · GatoPago Negocios' },
+    title: { default: 'GatoPago Business', template: '%s · GatoPago Business' },
     description: t('description'),
     robots: { index: false, follow: false },
     icons: { icon: '/favicon.svg' },

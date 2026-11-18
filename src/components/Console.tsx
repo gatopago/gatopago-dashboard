@@ -119,7 +119,7 @@ export function Console({ settings, children }: { settings: ClientSettings; chil
     <ConsoleContext value={{ settings, session }}>
       <div className="mx-auto flex min-h-dvh max-w-[1200px] flex-col md:flex-row">
         <aside className="hidden w-60 shrink-0 flex-col gap-8 border-r border-border px-5 py-7 md:flex">
-          <Link href="/" aria-label="GatoPago Negocios">
+          <Link href="/" aria-label="GatoPago Business">
             <Brand />
           </Link>
           <nav aria-label={t('sectionsLabel')} className="flex flex-col gap-1.5">
@@ -130,7 +130,7 @@ export function Console({ settings, children }: { settings: ClientSettings; chil
         {/* On phones every section stays in sight: they wrap instead of scrolling sideways. */}
         <header className="border-b border-border md:hidden">
           <div className="px-4 pt-4 pb-3">
-            <Link href="/" aria-label="GatoPago Negocios">
+            <Link href="/" aria-label="GatoPago Business">
               <Brand />
             </Link>
           </div>
