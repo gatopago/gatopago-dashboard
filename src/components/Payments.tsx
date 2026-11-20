@@ -80,7 +80,7 @@ export function Payments() {
             >
               <div className="min-w-0 flex-1">
                 <p className="type-mono text-[15px] font-semibold">
-                  {formatAmount(intent.amount, locale)} USDC
+                  {formatAmount(intent.amount, locale)} {intent.currency}
                 </p>
                 <p className="truncate text-[12px] text-text-faint">
                   {formatDate(intent.created_at, locale)}
@@ -150,7 +150,7 @@ export function PaymentDetail({ id }: { id: string }) {
         <section className="card-strong p-5">
           <div className="mb-4 flex flex-wrap items-center gap-3">
             <h1 className="type-mono text-[30px] font-bold">
-              {formatAmount(intent.amount, locale)} USDC
+              {formatAmount(intent.amount, locale)} {intent.currency}
             </h1>
             <Status status={intent.status} />
           </div>

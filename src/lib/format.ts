@@ -5,6 +5,8 @@ import { walletNetwork } from '@gatopago/shared/networks';
 export interface Intent {
   id: string;
   amount: string;
+  /** USDC, or another coin of a network (AUSD), paid and received on its own network. */
+  currency: string;
   status: 'requires_payment' | 'processing' | 'succeeded' | 'canceled' | 'expired';
   description: string | null;
   checkout_url: string;
