@@ -22,7 +22,7 @@
     "@category-labs/mera": "0.4.0",
     "@fontsource-variable/recursive": "5.3.0",
     "@gatopago/brand": "file:vendor/gatopago-brand-3.2.0.tgz",
-    "@gatopago/shared": "file:vendor/gatopago-shared-6.27.0.tgz",
+    "@gatopago/shared": "file:vendor/gatopago-shared-6.28.0.tgz",
     "next": "16.4.6",
     "next-intl": "4.14.9",
     "qrcode.react": "4.2.0",
