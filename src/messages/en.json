@@ -75,7 +75,7 @@
     "nameLabel": "Name your customers see when paying",
     "saving": "Saving…",
     "save": "Save",
-    "arrives": "Payments arrive at your GatoPago account on {network} (<code>{address}</code>). No custody: the money is yours from the first second.",
+    "arrives": "Payments arrive at your GatoPago account on {network} (<code>{address}</code>). GatoPago never holds them.",
     "integrate": "Integrate in three steps",
     "keyTitle": "Create an API key",
     "keyBody": "In <link>API keys</link>.",

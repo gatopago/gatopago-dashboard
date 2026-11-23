@@ -75,7 +75,7 @@
     "nameLabel": "Nombre que ven tus clientes al pagar",
     "saving": "Guardando…",
     "save": "Guardar",
-    "arrives": "Los cobros llegan a tu cuenta GatoPago en {network} (<code>{address}</code>). Sin custodia: el dinero es tuyo desde el primer segundo.",
+    "arrives": "Los cobros llegan a tu cuenta GatoPago en {network} (<code>{address}</code>). GatoPago nunca los custodia.",
     "integrate": "Intégralo en tres pasos",
     "keyTitle": "Crea una clave API",
     "keyBody": "En <link>Claves API</link>.",
